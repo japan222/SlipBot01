@@ -1,0 +1,36 @@
+<div class="container-dashboard">
+  <h1>Dashboard</h1>
+  <div class="dashboard-card">
+    <!-- ส่วนหัวตาราง -->
+    <div class="table-header">
+      <table>
+        <thead>
+          <tr>
+            <th>เวลา</th>
+            <th>ร้าน</th>
+            <th>รูปภาพ</th>
+            <th>ชื่อไลน์</th>
+            <th>สถานะการตรวจ</th>
+            <th>จำนวนเงิน</th>
+            <th>การตอบกลับ</th>
+            <th>REF</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- ส่วนแสดงผล -->
+      <div class="dashboard-table-wrapper table-body">
+        <table>
+          <tbody id="slip-results-body">
+          <!-- JS จะเติมข้อมูลตรงนี้ -->
+        </tbody>
+      </table>
+    
+      <!-- ✅ ย้ายเข้ามาตรงนี้ -->
+      <div id="loading-message" style="text-align:center; margin: 10px; font-weight: bold; color: #555;">
+        กำลังโหลด...
+      </div>
+    </div>
+
+<script src="/views/js/dashboard.js"></script>

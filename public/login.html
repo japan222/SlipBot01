@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - $lipCheck</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    .login-container {
+      width: 300px;
+      margin: 200px auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-container label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .password-container {
+      position: relative; /* เพื่อวางปุ่มลูกตาทับบน input ได้ */
+      margin-bottom: 15px;
+    }
+    /* ช่องกรอก Password */
+    .password-container input {
+      width: 100%;
+      padding: 10px;
+      padding-right: 40px; /* เว้นช่องด้านขวาไว้สำหรับปุ่มลูกตา */
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    /* ปุ่มลูกตา */
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 10px; 
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 18px; 
+      color: #888;
+    }
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin: 0 auto 15px auto;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .login-container button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .login-container button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    .alert-message {
+        display: none;
+        font-size: 14px;
+        font-weight: bold;
+        color: red;
+        text-align: center;
+        background-color: #ffe6e6;
+        border: 1px solid red;
+        padding: 8px;
+        border-radius: 5px;
+        margin: 20px auto;
+        width: fit-content; /* ให้ขนาดของกรอบพอดีกับข้อความ */
+        max-width: 100%; /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
+        min-width: 240px; /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="กรอกผู้ใช้งาน" required>
+      
+      <label for="password">Password</label>
+      <div class="password-container">
+        <input type="password" id="password" name="password" placeholder="กรอกรหัสผ่าน" required>
+        <!-- ปุ่มลูกตาเพื่อเปิดดูรหัสผ่าน -->
+        <button type="button" class="toggle-password" onclick="togglePassword()">
+          &#128065;
+        </button>
+      </div>
+      
+      <div id="alertMessage" class="alert-message"></div>
+      <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+  </div>
+  
+  <script>
+    // ฟังก์ชันแสดงข้อความแจ้งเตือน
+    function showAlertMessage(message) {
+      var alertDiv = document.getElementById("alertMessage");
+      alertDiv.innerText = message;
+      alertDiv.style.display = "block";
+      
+      // ซ่อนข้อความแจ้งเตือนหลัง 3 วินาที (3000 มิลลิวินาที)
+      setTimeout(function() {
+        alertDiv.style.display = "none";
+      }, 3000);
+    }
+    
+    // เมื่อหน้าโหลด ตรวจสอบพารามิเตอร์ error ใน URL
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("error")) {
+        showAlertMessage("ชื่อผู้ใช้ หรือรหัสผ่าน ไม่ถูกต้อง!");
+      }
+    };
+
+    // ฟังก์ชันสำหรับ toggle การแสดงรหัสผ่าน
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const toggleBtn = document.querySelector(".toggle-password");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleBtn.innerHTML = "&#128065;"; // สามารถใช้ icon อื่น ๆ ได้ตามต้องการ
+      } else {
+        passwordInput.type = "password";
+        toggleBtn.innerHTML = "&#128065;";
+      }
+    }
+  </script>
+</body>
+</html>

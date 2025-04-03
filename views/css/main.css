@@ -1,0 +1,649 @@
+.main-page body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #2c2c2c;
+}
+
+.main-page .container-main {
+  position: absolute;       /* ให้สามารถจัดตำแหน่งจากซ้าย */
+  left: 250px;              /* ชิดขอบ sidebar (ซ้าย) */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f8f8f8;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.main-page .container-main h1 {
+  text-align: center;
+  color: #2c2c2c;
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* Shop list ที่เลื่อนได้ */
+.main-page .shop-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main-page .shop-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.main-page .shop-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+  min-width: 0;
+}
+
+.main-page .status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 10px; /* เพิ่มระยะห่างจากขอบขวา */
+}
+
+.main-page .active .status-dot {
+  background-color: #28a745;
+}
+
+.main-page .inactive .status-dot {
+  background-color: #dc3545;
+}
+
+.main-page .shop-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* ขนาดสูงสุดของชื่อร้าน */
+}
+
+/* Toggle Switch CSS */
+.main-page .switch {
+  margin-right: 10px;
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  height: 24px;
+}
+
+.main-page .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.main-page .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.main-page .slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.main-page input:checked + .slider {
+  background-color: #28a745;
+}
+
+.main-page input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Buttons - ปรับการจัดระเบียบปุ่มให้มีระยะห่างที่พอเหมาะ */
+.main-page .buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-right: 10px; /* เพิ่มระยะห่างจากขอบขวา */
+}
+
+.main-page .buttons .btn {
+  min-width: 120px; /* กำหนดขนาดขั้นต่ำของปุ่ม */
+  padding: 10px 15px; /* ปรับขนาดปุ่มให้ใหญ่ขึ้น */
+  font-size: 14px; /* ขนาดตัวอักษร */
+  cursor: pointer;
+}
+
+.main-page .btn-line {
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 1px solid #aaaaaa;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.main-page .btn-info {
+  background-color: #28aa00;
+  color: #fff;
+  border: 1px solid #28aa00;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.main-page .btn-edit {
+  background-color: #ffc107;
+  color: #fff;
+  border: 1px solid #ffc107;
+  /* เพิ่มสีขอบปุ่ม */
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.main-page .btn-delete {
+  background-color: #dc3545;
+  color: #fff;
+  border: 1px solid #dc3545;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.main-page .btn-line:hover {
+  background-color: #a7a7a7;
+  /* สีพื้นหลังเมื่อ hover */;
+}
+
+.main-page .btn-info:hover {
+  background-color: #007a14;
+  border-color: #007a14;
+}
+
+.main-page .btn-edit:hover {
+  background-color: #d39e00;
+  border-color: #d39e00;
+}
+
+.main-page .btn-logo {
+  width: 15px;
+  margin-right: 8px;
+}
+
+.main-page .btn-delete:hover {
+  background-color: #8d000e;
+  border-color: #8d000e;
+}
+
+/* Footer อยู่ด้านล่างและคงที่ */
+.main-page .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  min-height: 40px; /* กำหนดความสูงขั้นต่ำ */
+  padding: 5px 0; /* เพิ่ม padding บนล่าง */
+}
+
+.main-page .quota {
+  font-size: 20px;
+  color: #2c2c2c;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+.main-page .slip-check-option {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-right: 15px;
+}
+
+/* ปรับสไตล์ของ select ปกติ */
+.main-page .slip-check-option select {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  width: 100%;
+  background-color: white;
+}
+
+.main-page .btn-add-shop {
+  position: fixed;
+  bottom: 20px;
+  right: 700px;
+  font-size: 18px;
+  padding: 20px 30px;
+  border-radius: 30px;
+  background: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.main-page .btn-add-shop:hover {
+  transform: translateY(-2px);
+  background: #0056b3;
+}
+
+.main-page .no-shop {
+  text-align: center;
+  color: #666;
+  font-size: 1em;
+  margin: 20px 0;
+}
+
+.main-page #modal-shop-title {
+  display: flex;
+  justify-content: center;
+  /* จัดข้อความและโลโก้ให้อยู่กลาง */
+  align-items: center;
+  /* จัดให้โลโก้และข้อความอยู่ในแถวเดียวกัน */
+  text-align: center;
+  /* จัดให้ข้อความอยู่ตรงกลาง */;
+}
+
+.main-page #line-logo {
+  width: 30px;
+  /* ปรับขนาดตามที่ต้องการ */
+  height: auto;
+  margin-right: 10px;
+  /* เพิ่มระยะห่างจากข้อความ */;
+}
+
+.main-page .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.main-page .modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 800px;
+  /* ขยายให้กว้างขึ้น */
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.main-page .showLine-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  /* ขยายให้กว้างขึ้น */
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.main-page .Line-modal-content {
+  background-color: white;
+  padding: 20px;
+  padding-right: 50px;
+  border-radius: 8px;
+  width: 600px;
+  /* ขยายให้กว้างขึ้น */
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.main-page .modal-close {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 30px;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.main-page .modal-close:hover {
+  color: #555;
+}
+
+/* ปุ่มเพิ่มไลน์ */
+.main-page .btn-add-line {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 40%;
+}
+
+.main-page .btn-add-line:hover {
+  background-color: #218838;
+}
+
+/* กล่องแสดงรายการไลน์ */
+.main-page .shop-line-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+  padding: 15px 20px; /* เพิ่ม padding บนล่าง */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  min-height: 50px; /* กำหนดความสูงขั้นต่ำ */
+}
+
+.main-page .line-btn-edit, .line-btn-delete {
+  padding: 8px 15px; /* เพิ่ม padding */
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 5px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+}
+
+.main-page .line-btn-edit {
+  background-color: #ffc711;
+  color: white;
+}
+
+.main-page .line-btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.main-page .line-btn-edit:hover {
+  background-color: #cf9c02;
+}
+
+.main-page .line-btn-delete:hover {
+  background-color: #a30414;
+}
+
+/* สไตล์ Modal Header */
+.main-page .modal-header {
+  display: flex;
+  justify-content: center;
+  /* ทำให้ทั้งโลโก้และข้อความอยู่กลาง */
+  align-items: center;
+  /* จัดแนวแนวตั้งให้กลาง */
+  gap: 10px;
+  /* ช่องว่างระหว่างโลโก้และข้อความ */
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.main-page .modal-header img {
+  width: 30px;
+  /* ขนาดของโลโก้ */;
+}
+
+.main-page .modal h2 {
+  text-align: center;
+  /* ทำให้หัวข้ออยู่ตรงกลาง */;
+}
+
+/* ปรับขนาดตัวอักษร */
+.modal h2 strong {
+  font-size: 1.2em;
+}
+
+/* ฟอร์มเพิ่มบัญชี LINE */
+.main-page .input-group {
+  margin-bottom: 25px;
+  position: relative;
+  width: 100%; /* เพิ่มความกว้างเป็น 100% */
+  max-width: 500px; /* กำหนดความกว้างสูงสุด */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-page .input-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* ปรับ padding และ margin ของ input */
+.main-page .input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin: 8px 0;
+}
+
+.main-page .input-group input:hover {
+  border-color: #bdbdbd;
+}
+
+.main-page .alert-message-Line {
+  display: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  background-color: #ffe6e6;
+  border: 1px solid red;
+  padding: 8px;
+  border-radius: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  /* ให้ขนาดของกรอบพอดีกับข้อความ */
+  max-width: 90%;
+  /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
+  min-width: 380px;
+  /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
+}
+
+.main-page .alert-message-Shop {
+  display: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  background-color: #ffe6e6;
+  border: 1px solid red;
+  padding: 8px;
+  border-radius: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  /* ให้ขนาดของกรอบพอดีกับข้อความ */
+  max-width: 90%;
+  /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
+  min-width: 220px;
+  /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
+}
+
+/* สไตล์ Modal */
+.main-page .addShop-modal, .editShop-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.main-page .addShop-modal-content, .editShop-modal-content {
+  background-color: white;
+  padding: 30px;  /* เพิ่ม padding */
+  border-radius: 12px; /* เพิ่มความโค้งมน */
+  width: 400px;   /* เพิ่มความกว้าง */
+  max-width: 90%; /* รองรับการแสดงผลบนจอเล็ก */
+  min-height: 200px; /* กำหนดความสูงขั้นต่ำ */
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* เพิ่มเงา */
+}
+
+/* ปรับขนาดฟอร์มภายใน modal */
+.main-page .addShop-modal-content .input-group,
+.main-page .editShop-modal-content .input-group {
+    width: 80%;
+    margin: 20px auto;
+}
+
+/* ปรับขนาด input */
+.main-page .addShop-modal-content input,
+.main-page .editShop-modal-content input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.main-page .alert-messageShop {
+  display: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  background-color: #ffe6e6;
+  border: 1px solid red;
+  padding: 8px;
+  border-radius: 5px;
+  margin: 20px auto;
+  margin-top: 20px;
+  width: fit-content;
+  /* ให้ขนาดของกรอบพอดีกับข้อความ */
+  max-width: 100%;
+  /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
+  min-width: 220px;
+  /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
+}
+
+.main-page .shopInfo-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.main-page .shopInfoTitle {
+  font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.main-page .shopInfo-modal-content {
+  background-color: white;
+  padding: 30px;  /* เพิ่ม padding */
+  border-radius: 12px; /* เพิ่มความโค้งมน */
+  width: 800px;   /* เพิ่มความกว้าง */
+  max-width: 90%; /* รองรับการแสดงผลบนจอเล็ก */
+  min-height: 200px; /* กำหนดความสูงขั้นต่ำ */
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* เพิ่มเงา */
+}
+
+.main-page .shopInfo-modal .no-line {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.main-page .shopInfo-modal .line-list-ul {
+  text-align: left;
+  padding-left: 50px;
+  margin-bottom: 30px;
+  line-height: 2.6;
+}
+
+.main-page .shopInfo-modal .top-list {
+  text-align: left;
+  padding-left: 20px;
+  font-size: 22px;
+}
+
+
+.main-page .webhook-path {
+  font-size: 18px;
+  color: #333;
+  padding-left: 20px;
+  display: inline-block;
+}
+
+.no-select-arrow {
+  user-select: none;
+  pointer-events: none;
+}
+
+.main-page .shopStateTitle {
+  font-weight: bold;
+  font-size: 22px;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.main-page .btn-line-save, .btn-shop-save {
+  padding: 12px 30px;
+  border-radius: 6px;
+  background: #28a745;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.main-page .btn-shop-save:hover, .btn-line-save:hover {
+  background-color: #218838;
+}

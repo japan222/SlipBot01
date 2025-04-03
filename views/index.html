@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>My SlipCheck</title>
+  <link rel="stylesheet" href="/views/css/shared.css">
+  <link rel="stylesheet" href="/views/css/main.css">
+  <link rel="stylesheet" href="/views/css/dashboard.css">
+  <link rel="stylesheet" href="/views/css/settings.css">
+  <link rel="stylesheet" href="/views/css/logs.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">$lipCheck</div>
+    <ul>
+      <li onclick="navigateTo(event, 'main')">หน้าหลัก</li>
+      <li onclick="navigateTo(event, 'dashboard')">Dashboard</li>
+      <li onclick="navigateTo(event, 'logs')">Logs</li>
+      <li onclick="navigateTo(event, 'settings')">ตั้งค่าบอท</li>
+    </ul>
+    <div class="footer">
+      <a href="/logout" style="color: white; text-decoration: none;">ออกจากระบบ</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content" id="main-content">
+    <h2>กำลังโหลด...</h2>
+  </div>
+
+  <!-- Script -->
+  <script>
+    // Escape HTML เพื่อความปลอดภัย
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.innerText = str;
+      return div.innerHTML;
+    }
+
+    // แสดงข้อความโหลด
+    function showLoading(message = "กำลังโหลด...") {
+      const content = document.getElementById("main-content");
+      content.innerHTML = `<p style="text-align:center; font-size:18px; color:#555;">${message}</p>`;
+    }
+
+    // โหลดหน้า HTML
+    function loadPage(event, page) {
+    if (event) event.preventDefault?.();
+
+    // ล้าง active class
+    const links = document.querySelectorAll(".sidebar li");
+    links.forEach(link => link.classList.remove("active"));
+
+    if (event?.target?.tagName === "LI") {
+      event.target.classList.add("active");
+    }
+
+    showLoading();
+
+    fetch(`/page/${page}`)
+      .then(res => {
+        if (!res.ok) throw new Error("ไม่สามารถโหลดหน้าได้");
+        return res.text();
+      })
+      .then(html => {
+        const container = document.getElementById("main-content");
+        container.innerHTML = html;
+
+        // โหลด script จากหน้า innerHTML
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        const scripts = tempDiv.querySelectorAll("script[src]");
+
+        let loaded = 0;
+        if (scripts.length === 0) finalize();
+
+        scripts.forEach(tag => {
+          const s = document.createElement("script");
+          s.src = tag.src;
+          s.onload = () => { loaded++; if (loaded === scripts.length) finalize(); };
+          document.body.appendChild(s);
+        });
+
+        // ✅ ต้องอยู่นอก then/html เพื่อไม่ให้หลุด scope
+        function finalize() {
+        if (page === "main" && typeof loadShopsAndRender === "function") {
+          loadShopsAndRender();
+        }
+
+        if (page === "dashboard" && typeof initDashboard === "function") {
+          initDashboard(); // 🟢 โหลด slip + scroll
+          setupSSE();      // 🟢 เชื่อมต่อ SSE
+        }
+      }
+
+      if (page === "logs") {
+        const logsContainer = document.getElementById("logs");
+        const eventSource = new EventSource("/api/logs");
+        const MAX_LOGS = 50; // กำหนดจำนวนรายการสูงสุดที่จะแสดง
+
+        eventSource.onmessage = (event) => {
+          if (event.data) {
+            const logEntry = document.createElement("div");
+            logEntry.className = "log-entry";
+            logEntry.textContent = event.data;
+            logsContainer.appendChild(logEntry);
+
+            // ตรวจสอบและลบรายการเก่าถ้าเกิน MAX_LOGS
+            while (logsContainer.children.length > MAX_LOGS) {
+            logsContainer.firstElementChild.remove();
+          }
+
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+          }
+        };
+
+        eventSource.onerror = () => {
+          const errorEntry = document.createElement("div");
+          errorEntry.className = "log-entry error";
+          errorEntry.textContent = "❌ การเชื่อมต่อมีปัญหา กำลังเชื่อมต่อใหม่...";
+          logsContainer.appendChild(errorEntry);
+        };
+      }
+
+      function setupSSE() {
+        if (window._sseConnected) return;
+        const sse = new EventSource("/events");
+        sse.onopen = () => console.log("✅ SSE opened");
+        sse.onerror = e => console.error("❌ SSE error", e);
+        sse.onmessage = (e) => {
+          try {
+            const newSlip = JSON.parse(e.data);
+            console.log("📩 New slip:", newSlip);
+            window.slipResults = window.slipResults || [];
+            window.slipResults.unshift(newSlip);
+            const tbody = document.getElementById("slip-results-body");
+            if (tbody) {
+              tbody.innerHTML = "";
+              renderSlipResults(0, window.visibleCount || 100);
+            }
+          } catch (err) {
+            console.error("❌ Error parsing SSE:", err);
+          }
+        };
+        window._sseConnected = true;
+      }
+    })
+    .catch(err => {
+      document.getElementById("main-content").innerHTML = `<p style="color:red">เกิดข้อผิดพลาด: ${err.message}</p>`;
+    });
+}
+
+function navigateTo(e, p) { loadPage(e, p); }
+window.addEventListener("DOMContentLoaded", () => loadPage(null, "main"));
+</script>
+</body>
+</html>

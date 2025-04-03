@@ -1,0 +1,142 @@
+<div class="main-page">
+    <div class="container-main">
+    <h1>หน้าหลัก</h1>
+    <!-- Shop list: ส่วนที่เลื่อนได้ -->
+    <div class="shop-list" id="shop-list">
+      <!-- รายการร้านค้าจะถูกเติมด้วย JavaScript -->
+    </div>
+<!-- ปุ่มเพิ่มร้านค้า -->
+<div class="footer">
+    <div class="quota" style="text-align:right; font-weight:bold; margin-bottom: 10px;">
+        กำลังโหลดโควต้า...
+      </div>
+    <div class="button-group">
+        <button class="btn-add-shop" onclick="openAddShopModal()">+ เพิ่มร้านค้า</button>
+    </div>
+</div>
+
+<!-- Modal รายการบัญชี LINE -->
+<div id="shopLinesModal" class="modal">
+    <div class="showLine-modal-content">
+        <span class="modal-close" onclick="closeShopLinesModal()">&times;</span>
+        <h2 id="modal-shop-title">รายการบัญชี <strong>LINE</strong> ร้าน</h2>
+        <div id="line-list"></div> <!-- แสดงรายการบัญชี LINE -->
+        <button class="btn-add-line" onclick="addNewLine()">+ เพิ่มบัญชีไลน์</button>
+    </div>
+</div>
+
+
+<!-- Modal เพิ่มบัญชี LINE -->
+<div id="addLineModal" class="modal">
+    <div class="Line-modal-content">
+        <span class="modal-close" onclick="closeAddLineModal()">&times;</span>
+        <h2>
+            <div class="modal-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/LINE_logo.svg/120px-LINE_logo.svg.png" width="40px" />
+                <strong>เพิ่ม LINE ให้ร้าน <span id="shopNameTitle"></span></strong>
+            </div>
+        </h2>
+
+        <div class="input-group">
+            <label>ชื่อไลน์</label>
+            <input type="text" id="newLineName">
+        </div>
+
+        <div class="input-group">
+            <label>Access Token</label>
+            <input type="text" id="newAccessToken">
+        </div>
+
+        <div class="input-group">
+            <label>Secret Token</label>
+            <input type="text" id="newSecretToken">
+        </div>
+        <div id="alertMessageAddline" class="alert-message-Line"></div>
+        <button class="btn-line-save" onclick="saveNewLine()">บันทึก</button>
+    </div>
+</div>
+
+<!-- Modal แก้ไขบัญชี LINE -->
+<div id="editLineModal" class="modal">
+    <div class="Line-modal-content">
+        <span class="modal-close" onclick="closeEditLineModal()">&times;</span>
+        <h2>แก้ไขบัญชี LINE</h2>
+
+        <div class="input-group">
+            <label>ชื่อไลน์</label>
+            <input type="text" id="editLinename">
+        </div>
+
+        <div class="input-group">
+            <label>Access Token</label>
+            <input type="text" id="editAccessToken">
+        </div>
+
+        <div class="input-group">
+            <label>Secret Token</label>
+            <input type="text" id="editSecretToken">
+        </div>
+        <div id="alertMessageEditLine" class="alert-message-Line"></div>
+        <button class="btn-line-save" onclick="saveEditedLine()">บันทึก</button>
+    </div>
+</div>
+<!-- Modal แก้ไขร้านค้า -->
+<div id="editShopModal" class="modal">
+    <div class="editShop-modal-content">
+      <span class="modal-close" onclick="closeEditShopModal()">&times;</span>
+      <h2>แก้ไขร้านค้า</h2>
+  
+      <div class="input-group">
+        <label>ชื่อร้าน:</label>
+        <input type="text" id="editShopName">
+      </div>
+  
+      <div class="input-group">
+        <label>Prefix:</label>
+        <input type="text" id="editShopPrefix" disabled>
+      </div>
+      <div id="alertMessageEditShop" class="alert-message-Shop"></div>
+      <button class="btn-shop-save" onclick="saveShopChanges()">บันทึก</button>
+    </div>
+  </div>
+
+<!-- Modal สำหรับเพิ่มร้านค้า -->
+<div id="addShopModal" class="modal">
+    <div class="addShop-modal-content">
+        <!-- ปุ่มปิด Modal (X) -->
+        <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
+
+        <h2>เพิ่มร้านค้า</h2>
+
+        <div class="input-group">
+            <label>ชื่อร้าน:</label>
+            <input type="text" id="shopName">
+        </div>
+
+        <div class="input-group">
+            <label>Prefix:</label>
+            <input type="text" id="shopPrefix">
+        </div>
+        <div id="alertMessageShop" class="alert-message-Shop"></div>
+
+        <button class="btn-shop-save" onclick="addShop()">บันทึก</button>
+    </div>
+</div>
+
+<!-- Modal แสดงข้อมูลร้าน -->
+<div id="shopInfoModal" class="modal shopInfo-modal">
+    <div class="shopInfo-modal-content">
+      <span class="modal-close" onclick="closeShopInfoModal()">&times;</span>
+      <h2 id="shopInfoTitle" class="shopInfoTitle">ข้อมูลร้าน:</h2>
+      <div id="shopInfoBody">
+        <!-- ใส่รายละเอียดร้านเพิ่มเติมที่นี่ในอนาคต -->
+      </div>
+  
+      <p id="shopStateTitle" class="shopStateTitle">ข้อมูลการตรวจสลิป</p>
+      <div id="shopStateBody"></div>
+    </div>
+  </div>
+    <script src="/views/js/main.js"></script>
+  </div>
+</body>
+</html>

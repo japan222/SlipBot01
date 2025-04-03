@@ -1,0 +1,35 @@
+<body class="settings-page">
+  <div class="settings-container">
+    <link rel="stylesheet" href="/views/css/settings.css">
+    <h1>ตั้งค่าระบบ</h1>
+    
+    <div class="setting-item">
+      <label>เวลาจำกัดการตรวจสลิปใหม่ (วินาที)</label>
+      <input type="number" id="timeLimit" min="1" step="1" value="120">
+    </div>
+    
+    <div class="setting-item">
+      <label>เวลาจำกัดสำหรับสลิปซ้ำ (วินาที)</label>
+      <input type="number" id="sameQrTimeLimit" min="1" step="1" value="1200">
+    </div>
+    
+    <div class="setting-item">
+      <label>จำนวนครั้งสูงสุดต่อผู้ใช้</label>
+      <input type="number" id="maxMessagesPerUser" min="1" step="1" value="3">
+    </div>
+    
+    <div class="setting-item">
+      <label>จำนวนครั้งแจ้งเตือนซ้ำสูงสุด</label>
+      <input type="number" id="maxMessagesSamePerUser" min="1" step="1" value="2">
+    </div>
+    
+    <div class="setting-item">
+      <label>จำนวนคิวสูงสุดต่อผู้ใช้</label>
+      <input type="number" id="maxProcessingPerUser" min="1" step="1" value="2">
+    </div>
+    
+    <button class="save-btn" onclick="saveSettings()">บันทึกการตั้งค่า</button>
+    <button class="reset-btn" onclick="resetSettings()">คืนค่าเริ่มต้น</button>
+  </div>
+</body>
+<script src="/views/js/setting.js"></script>

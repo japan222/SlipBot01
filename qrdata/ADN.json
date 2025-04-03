@@ -1,0 +1,1563 @@
+[
+  {
+    "qrData": "0040000600000101030040219055091TDSQAFBMGJWEY5102TH91047D74",
+    "firstDetected": 1743499210728,
+    "users": [
+      [
+        "U687664c116852080b42929f213c39190",
+        {
+          "lastSentTime": 1743499210728,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0041000600000101030040220015091173122BOR082765102TH9104FCB7",
+    "firstDetected": 1743503521944,
+    "users": [
+      [
+        "Uab1e951ce317fab6ca1f9f6abbc27c4e",
+        {
+          "lastSentTime": 1743503521944,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1055
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725091178577235102TH9104CF9D",
+    "firstDetected": 1743504980127,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743504980127,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 40
+  },
+  {
+    "qrData": "0046000600000101030140225202504016LAMETjHYwoRWunEK5102TH9104DF58",
+    "firstDetected": 1743506992047,
+    "users": [
+      [
+        "Ue58f530df24dcf7066677641d8902f11",
+        {
+          "lastSentTime": 1743506992047,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "00460006000001010301402252025040183R3JPB1BpWTd1KsQ5102TH91046023",
+    "firstDetected": 1743509178691,
+    "users": [
+      [
+        "U722964ca428bd11f8e904477a649621b",
+        {
+          "lastSentTime": 1743509178691,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0041000600000101030040220015091204434AOR046065102TH9104E72F",
+    "firstDetected": 1743515107714,
+    "users": [
+      [
+        "Ue4e166d7e12ebaa4a0310668d3298558",
+        {
+          "lastSentTime": 1743515107714,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "004600060000010103002022520250401211849230009724085102TH91046CAE",
+    "firstDetected": 1743517177222,
+    "users": [
+      [
+        "U047d99d2a90a37ac6fcb6f4dceca5bfd",
+        {
+          "lastSentTime": 1743517177222,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015091211556BOR026195102TH91040FAD",
+    "firstDetected": 1743517244021,
+    "users": [
+      [
+        "Uec201df493d4244c2c00544b213acbca",
+        {
+          "lastSentTime": 1743517244021,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 917
+  },
+  {
+    "qrData": "0041000600000101030040220015091212225COR012535102TH91043D8A",
+    "firstDetected": 1743517377653,
+    "users": [
+      [
+        "Uecc3aa7ea47e44c83aa847d507b81037",
+        {
+          "lastSentTime": 1743517377653,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 56
+  },
+  {
+    "qrData": "0038000600000101030060217A23a28b87066c49235102TH91048604",
+    "firstDetected": 1743517496502,
+    "users": [
+      [
+        "Ua585ebbf3e0593f066b1583fd51c0260",
+        {
+          "lastSentTime": 1743517496502,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015091212434AOR010765102TH9104FF31",
+    "firstDetected": 1743517559631,
+    "users": [
+      [
+        "U2b576b63ba1b8c7f0892a4234dfdc3e5",
+        {
+          "lastSentTime": 1743517559631,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0045000600000101030300224509121769964I000014B97905102TH91042075",
+    "firstDetected": 1743517639358,
+    "users": [
+      [
+        "U7977267c31d223ee652e0192cc95e348",
+        {
+          "lastSentTime": 1743517639358,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 198
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00232790825091215621765102TH9104A143",
+    "firstDetected": 1743517723366,
+    "users": [
+      [
+        "U5aa54bdc500735a409ad726227f1b2ae",
+        {
+          "lastSentTime": 1743517723366,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "00390006000001010301102182025040121051147935102TH910440E5",
+    "firstDetected": 1743517796609,
+    "users": [
+      [
+        "U10276c4d122878fb9bb32539b814cdcd",
+        {
+          "lastSentTime": 1743517796609,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015091212859BOR056685102TH9104CEDB",
+    "firstDetected": 1743517813749,
+    "users": [
+      [
+        "Ua9ffed9bb1b9f180824e6876b0d077e7",
+        {
+          "lastSentTime": 1743517813749,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 500
+  },
+  {
+    "qrData": "0046000600000101030140225202504013EQPo1kGRBY4wOULV5102TH9104D2B4",
+    "firstDetected": 1743517843707,
+    "users": [
+      [
+        "Uf924e017e5601d08d5d208783c2bc79f",
+        {
+          "lastSentTime": 1743517843707,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 500
+  },
+  {
+    "qrData": "0045000600000101030300224509121312842I000020B97905102TH9104DB65",
+    "firstDetected": 1743517922855,
+    "users": [
+      [
+        "U4f091d6794e50fbd9806f7a544d6199c",
+        {
+          "lastSentTime": 1743517922855,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 23
+  },
+  {
+    "qrData": "0038000600000101030060217Acc258db125b049595102TH9104CC5B",
+    "firstDetected": 1743517975213,
+    "users": [
+      [
+        "Ua585ebbf3e0593f066b1583fd51c0260",
+        {
+          "lastSentTime": 1743517975213,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015091213445BOR060095102TH910437E3",
+    "firstDetected": 1743518094358,
+    "users": [
+      [
+        "U2b576b63ba1b8c7f0892a4234dfdc3e5",
+        {
+          "lastSentTime": 1743518094358,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 400
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00232790825091215876435102TH91049030",
+    "firstDetected": 1743518420211,
+    "users": [
+      [
+        "U5aa54bdc500735a409ad726227f1b2ae",
+        {
+          "lastSentTime": 1743518420211,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0041000600000101030040220015091213421BOR011985102TH910437A7",
+    "firstDetected": 1743518971861,
+    "users": [
+      [
+        "U3553cc46b36e0aed08b5f06b0d761417",
+        {
+          "lastSentTime": 1743518971861,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 189
+  },
+  {
+    "qrData": "0045000600000101030300224509121323786I000015B97905102TH91046489",
+    "firstDetected": 1743519095289,
+    "users": [
+      [
+        "U34bf7dada0ec77319aedcbb3b28e740d",
+        {
+          "lastSentTime": 1743519095289,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0038000600000101030060217Af334c5dc65e841675102TH910415E4",
+    "firstDetected": 1743519335564,
+    "users": [
+      [
+        "U23580e4a9cf78ef7a613aa2509580137",
+        {
+          "lastSentTime": 1743520009500,
+          "messageCount": 2
+        }
+      ]
+    ],
+    "amount": 25
+  },
+  {
+    "qrData": "0041000600000101030040220015091224348BOR005245102TH9104E0AA",
+    "firstDetected": 1743522248174,
+    "users": [
+      [
+        "U458b3ae5fa489a0745447fd63f728196",
+        {
+          "lastSentTime": 1743522248174,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1000
+  },
+  {
+    "qrData": "0041000600000101030040220015091223652AOR082395102TH910443B8",
+    "firstDetected": 1743523486743,
+    "users": [
+      [
+        "U84970af3dab98d83f230c13256bb9137",
+        {
+          "lastSentTime": 1743523486743,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 150
+  },
+  {
+    "qrData": "004600060000010103002022520250402000002240043300085102TH9104F454",
+    "firstDetected": 1743526843199,
+    "users": [
+      [
+        "U5d07251a130b2815a6b4c92ef6e563ef",
+        {
+          "lastSentTime": 1743526843199,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0046000600000101030140225202504027WbNzJPhP9DfQSvLX5102TH91042992",
+    "firstDetected": 1743528599346,
+    "users": [
+      [
+        "U9fb7c91bb1ff619fc36d7420bee9abec",
+        {
+          "lastSentTime": 1743528599346,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030140225202504025DEJrD1xEGguYeOyj5102TH9104567E",
+    "firstDetected": 1743529527997,
+    "users": [
+      [
+        "Ua8510f446c4baf1ff16131f81420c1a2",
+        {
+          "lastSentTime": 1743529527997,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 30
+  },
+  {
+    "qrData": "0041000600000101030040220015092004655AOR061775102TH91047345",
+    "firstDetected": 1743529802286,
+    "users": [
+      [
+        "U37b220d945afc03f40847ba9bd5cfd7f",
+        {
+          "lastSentTime": 1743529802286,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "004600060000010103014022520250402718UWtu37ANkBEur05102TH9104B5CC",
+    "firstDetected": 1743529857393,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743529857393,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030140225202504029ew7GIAzGDr5DErDv5102TH91041F6C",
+    "firstDetected": 1743530169345,
+    "users": [
+      [
+        "U9fb7c91bb1ff619fc36d7420bee9abec",
+        {
+          "lastSentTime": 1743530169345,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030140225202504021TKeyUU3D82ZnZ4RK5102TH9104E4EE",
+    "firstDetected": 1743542869844,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743542869844,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0046000600000101030140225202504023HEv5v0hki4xjowj85102TH91048737",
+    "firstDetected": 1743544039556,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743544039556,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0046000600000101030140225202504022NHuhhM9YxnuNWzmG5102TH91040FF8",
+    "firstDetected": 1743547140286,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743547140286,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "004600060000010103014022520250402289nG7KTJHm8ObXfh5102TH9104F207",
+    "firstDetected": 1743548374322,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743548374322,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092071761355102TH9104BF5F",
+    "firstDetected": 1743555521702,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743555521702,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 30
+  },
+  {
+    "qrData": "0045000600000101030300224509210920641I000014B97905102TH9104268A",
+    "firstDetected": 1743565744340,
+    "users": [
+      [
+        "Uc90b89c4d46afb7c174bc0ea89b7214e",
+        {
+          "lastSentTime": 1743565744340,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015092104831AOR074865102TH910452F6",
+    "firstDetected": 1743565816345,
+    "users": [
+      [
+        "U0a2e1bf6f849b308abaea57df7d7befa",
+        {
+          "lastSentTime": 1743565826682,
+          "messageCount": 2
+        }
+      ]
+    ],
+    "amount": 160
+  },
+  {
+    "qrData": "0041000600000101030040220015092104853AOR064385102TH9104756F",
+    "firstDetected": 1743565841086,
+    "users": [
+      [
+        "U7243c8213c9b8036df58169c220792a8",
+        {
+          "lastSentTime": 1743565841086,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015092104950BOR076835102TH9104E70F",
+    "firstDetected": 1743566120501,
+    "users": [
+      [
+        "Ud36c8ea3d836ad2e1ea69bffd134ec3b",
+        {
+          "lastSentTime": 1743566120501,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015092105447BOR011075102TH910473C0",
+    "firstDetected": 1743566145244,
+    "users": [
+      [
+        "U4c9c4e461e64c4fb882b35b81169885a",
+        {
+          "lastSentTime": 1743566145244,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 500
+  },
+  {
+    "qrData": "0041000600000101030040220015092105752COR081835102TH9104949C",
+    "firstDetected": 1743566444334,
+    "users": [
+      [
+        "U8d4cf353194b2bd56195a0a651de52db",
+        {
+          "lastSentTime": 1743566444334,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0038000600000101030060217A7bf7c4f7bd914c4e5102TH91043983",
+    "firstDetected": 1743569128476,
+    "users": [
+      [
+        "U589293b6bf38776e2a02d7280a82c5c3",
+        {
+          "lastSentTime": 1743569128476,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "004600060000010103014022520250402492CLN6CokWXdf0tm5102TH91048C7A",
+    "firstDetected": 1743569196308,
+    "users": [
+      [
+        "U8dbceea719a91281099f2e81149e8288",
+        {
+          "lastSentTime": 1743569196308,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "0038000600000101030060217Ac303e9096e1a4b885102TH9104FF3B",
+    "firstDetected": 1743569400729,
+    "users": [
+      [
+        "U0f3502afc2e0012f9799a5cd9f83bfb4",
+        {
+          "lastSentTime": 1743569400729,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 190
+  },
+  {
+    "qrData": "0041000600000101030040220015092122915BOR024465102TH91048254",
+    "firstDetected": 1743571778753,
+    "users": [
+      [
+        "Uc4f386ace776ae7430c9080b26f9b6d2",
+        {
+          "lastSentTime": 1743571778753,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0038000600000101030060217A78990f03f99549ef5102TH9104B777",
+    "firstDetected": 1743576446608,
+    "users": [
+      [
+        "Ub26587ddb795a5c4a7ed117df6d86988",
+        {
+          "lastSentTime": 1743576446608,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0038000600000101030060217A01828e8ea5ae44395102TH91044C40",
+    "firstDetected": 1743578625160,
+    "users": [
+      [
+        "Ub9185ca469863c3b760d4a58108db88b",
+        {
+          "lastSentTime": 1743578625160,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0041000600000101030040220015092144244COR032555102TH91045327",
+    "firstDetected": 1743579852015,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743579852015,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 2000
+  },
+  {
+    "qrData": "0041000600000101030040220015092144209BOR043475102TH9104E547",
+    "firstDetected": 1743579939056,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743579939056,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1600
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092144573015102TH9104BE18",
+    "firstDetected": 1743580131891,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743580131891,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 40
+  },
+  {
+    "qrData": "0041000600000101030040220015092150641COR022485102TH91043342",
+    "firstDetected": 1743581291588,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743581291588,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1300
+  },
+  {
+    "qrData": "0041000600000101030040220015092151121COR080855102TH91044023",
+    "firstDetected": 1743581522944,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743581522944,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1100
+  },
+  {
+    "qrData": "0041000600000101030040220015092151824BOR072115102TH910464A3",
+    "firstDetected": 1743581959477,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743581959477,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 3000
+  },
+  {
+    "qrData": "0041000600000101030040220015092153108AOR079735102TH910479D4",
+    "firstDetected": 1743582679107,
+    "users": [
+      [
+        "U869a6ac7dfba1eba27ac637aa43d26f1",
+        {
+          "lastSentTime": 1743582679107,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 3400
+  },
+  {
+    "qrData": "0046000600000101030140225202504020O8rrDVdvegxPxIFt5102TH91044425",
+    "firstDetected": 1743583146349,
+    "users": [
+      [
+        "Ufdb9e9bd7b1023371fca7db70dfc3a93",
+        {
+          "lastSentTime": 1743583146349,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1000
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092156772285102TH91049A04",
+    "firstDetected": 1743584293216,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743584293216,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 40
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092167050465102TH91045FD1",
+    "firstDetected": 1743584798588,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743584798588,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 40
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092167300575102TH9104E10C",
+    "firstDetected": 1743585253818,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743585253818,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 10
+  },
+  {
+    "qrData": "0046000600000101030140225202504029Xcsn0OVW8yU9eWB95102TH91048414",
+    "firstDetected": 1743585524132,
+    "users": [
+      [
+        "Ufdb9e9bd7b1023371fca7db70dfc3a93",
+        {
+          "lastSentTime": 1743585524132,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1000
+  },
+  {
+    "qrData": "00460006000001010301402252025040255JEtIigMcBqUSNnD5102TH9104FD74",
+    "firstDetected": 1743585571613,
+    "users": [
+      [
+        "U5568b34f981e260aec8db6356cfb75e2",
+        {
+          "lastSentTime": 1743585571613,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "00460006000001010301402252025040228LcYV976pQl8qmrO5102TH91046D11",
+    "firstDetected": 1743585705084,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743585705084,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 60
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092167885895102TH9104C8BA",
+    "firstDetected": 1743586299468,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743586299468,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 20
+  },
+  {
+    "qrData": "0041000600000101030040220015092164152BOR044625102TH910405C7",
+    "firstDetected": 1743587165201,
+    "users": [
+      [
+        "U9e61da976a5f8752c277ada03dd51b6a",
+        {
+          "lastSentTime": 1743587165201,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092170525525102TH91047018",
+    "firstDetected": 1743590544276,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743590544276,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015092174351AOR034565102TH91048DAD",
+    "firstDetected": 1743590678660,
+    "users": [
+      [
+        "Ue4e166d7e12ebaa4a0310668d3298558",
+        {
+          "lastSentTime": 1743590678660,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 80
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092182138885102TH910479BC",
+    "firstDetected": 1743593063529,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743593063529,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015092190209AOR054775102TH91040FBF",
+    "firstDetected": 1743595360539,
+    "users": [
+      [
+        "U458b3ae5fa489a0745447fd63f728196",
+        {
+          "lastSentTime": 1743595360539,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "004600060000010103002022520250402190408240028368085102TH9104BC58",
+    "firstDetected": 1743595497262,
+    "users": [
+      [
+        "Ue82ac2a3422078686198a5d5a83965c7",
+        {
+          "lastSentTime": 1743595497262,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0046000600000101030140225202504027HCkOAGqGpdV5O4Ct5102TH9104E3B8",
+    "firstDetected": 1743595542308,
+    "users": [
+      [
+        "U9fb7c91bb1ff619fc36d7420bee9abec",
+        {
+          "lastSentTime": 1743595542308,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0038000600000101030060217A0cbc95b3f695440e5102TH9104A19A",
+    "firstDetected": 1743595842870,
+    "users": [
+      [
+        "U950ee4198589f7b52e20787a5255778e",
+        {
+          "lastSentTime": 1743595842870,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 120
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092193963745102TH9104442E",
+    "firstDetected": 1743595855056,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743595855056,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0046000600000101030140225202504021uiofpcj9T9hRZkfo5102TH9104189B",
+    "firstDetected": 1743595881658,
+    "users": [
+      [
+        "U8dbceea719a91281099f2e81149e8288",
+        {
+          "lastSentTime": 1743595881658,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1030
+  },
+  {
+    "qrData": "0041000600000101030040220015092191018BOR085815102TH9104F8AF",
+    "firstDetected": 1743596003946,
+    "users": [
+      [
+        "Ue453b2c8e8f61413164cd435fd2b7c38",
+        {
+          "lastSentTime": 1743596003946,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 500
+  },
+  {
+    "qrData": "0046000600000101030140225202504021EdM9WsVV0pvsQBDr5102TH91043872",
+    "firstDetected": 1743597368570,
+    "users": [
+      [
+        "U5568b34f981e260aec8db6356cfb75e2",
+        {
+          "lastSentTime": 1743597368570,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0038000600000101030060217Ac03238b3600343a15102TH91047897",
+    "firstDetected": 1743599644511,
+    "users": [
+      [
+        "Uc37692da2e9a06253c199eba03674eb3",
+        {
+          "lastSentTime": 1743599644511,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "0046000600000101030140225202504022Yu1qS2sZtHKXKQFN5102TH9104C7F7",
+    "firstDetected": 1743602811419,
+    "users": [
+      [
+        "Ucb90ff9e1c9d4533e1cc3575457a0d0e",
+        {
+          "lastSentTime": 1743602811419,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0038000600000101030060217Ab139b16d180d41555102TH9104A570",
+    "firstDetected": 1743606184783,
+    "users": [
+      [
+        "U3d93dc8b774285f9b84612871b5f4ef5",
+        {
+          "lastSentTime": 1743607011435,
+          "messageCount": 2
+        }
+      ]
+    ],
+    "amount": 30
+  },
+  {
+    "qrData": "0046000600000101030140225202504029SKLLiIIXzEeFj9ox5102TH9104FC60",
+    "firstDetected": 1743606349352,
+    "users": [
+      [
+        "U4959ca9a584dfc4925717e2e3d943205",
+        {
+          "lastSentTime": 1743606349352,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015092223456AOR098265102TH91040C0D",
+    "firstDetected": 1743608164362,
+    "users": [
+      [
+        "Ucba2f8a66d825209ae4f9e48494a7e9f",
+        {
+          "lastSentTime": 1743608164362,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0046000600000101030140225202504029EUb2xSodZbRReBdf5102TH91040851",
+    "firstDetected": 1743608194597,
+    "users": [
+      [
+        "U4c7409194c27acedfdd8d2a8fefa1479",
+        {
+          "lastSentTime": 1743608194597,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "004600060000010103002022520250402225142230044575085102TH91046015",
+    "firstDetected": 1743609120245,
+    "users": [
+      [
+        "Udf3c72dcb466cf4b0105157f37fd9fbd",
+        {
+          "lastSentTime": 1743609120245,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0046000600000101030340225MTI00380246725092239834985102TH9104B20B",
+    "firstDetected": 1743610222473,
+    "users": [
+      [
+        "Uce001152fe9590e9966a067b2cf77ad1",
+        {
+          "lastSentTime": 1743610222473,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 20
+  },
+  {
+    "qrData": "00460006000001010301402252025040276NmqabOPoxnIo8FG5102TH9104B77C",
+    "firstDetected": 1743611283061,
+    "users": [
+      [
+        "U1f7e35e2824f412299289abd1a6439ac",
+        {
+          "lastSentTime": 1743611283061,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015092232832COR070565102TH91044AF8",
+    "firstDetected": 1743611360804,
+    "users": [
+      [
+        "Ucba2f8a66d825209ae4f9e48494a7e9f",
+        {
+          "lastSentTime": 1743611360804,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "00400006000001010300402190550927VEQC3FGPOLF65102TH91045ED6",
+    "firstDetected": 1743611427351,
+    "users": [
+      [
+        "U7361b7f0d9c9f90777a3cf99e56b2614",
+        {
+          "lastSentTime": 1743611427351,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 60
+  },
+  {
+    "qrData": "0046000600000101030140225202504021X07THcOjsc5kmhNC5102TH91047919",
+    "firstDetected": 1743612487561,
+    "users": [
+      [
+        "U1f7e35e2824f412299289abd1a6439ac",
+        {
+          "lastSentTime": 1743612487561,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030140225202504034kucF07qTMiG8QSNx5102TH9104D555",
+    "firstDetected": 1743614025752,
+    "users": [
+      [
+        "U1f7e35e2824f412299289abd1a6439ac",
+        {
+          "lastSentTime": 1743614025752,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015093001433BOR064225102TH9104D91C",
+    "firstDetected": 1743614089098,
+    "users": [
+      [
+        "U2a35c219c094e9cc4c53ad11428f2697",
+        {
+          "lastSentTime": 1743614089098,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "004600060000010103002022520250402235621240057687085102TH91043336",
+    "firstDetected": 1743614405575,
+    "users": [
+      [
+        "U56b39e0f12af97f68b268f3d522acf4b",
+        {
+          "lastSentTime": 1743614405575,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0040000600000101030040219055093A45AA3FGPOLB45102TH910420E0",
+    "firstDetected": 1743628091494,
+    "users": [
+      [
+        "U7361b7f0d9c9f90777a3cf99e56b2614",
+        {
+          "lastSentTime": 1743628091494,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 70
+  },
+  {
+    "qrData": "0040000600000101030040219055093PZPAA4CAXEOVO5102TH91048197",
+    "firstDetected": 1743637465575,
+    "users": [
+      [
+        "U56e1303a7fcc7a12ef3a69f824a969e0",
+        {
+          "lastSentTime": 1743637465575,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 6
+  },
+  {
+    "qrData": "0041000600000101030040220015093064522BOR056835102TH9104A1AA",
+    "firstDetected": 1743637569151,
+    "users": [
+      [
+        "Ue4e166d7e12ebaa4a0310668d3298558",
+        {
+          "lastSentTime": 1743637569151,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0045000600000101030300224509307103329I000024B97905102TH910471D1",
+    "firstDetected": 1743641440959,
+    "users": [
+      [
+        "U8f7c4d0b4a7ca47f17216c6a3712f949",
+        {
+          "lastSentTime": 1743641440959,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0046000600000101030140225202504035DwSbIggjZXqMFoSf5102TH91044F30",
+    "firstDetected": 1743641451465,
+    "users": [
+      [
+        "U5199ff10fbe8d4ea580ce9a1027f00d8",
+        {
+          "lastSentTime": 1743641451465,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015093075400AOR023375102TH9104C43C",
+    "firstDetected": 1743641723477,
+    "users": [
+      [
+        "Ue453b2c8e8f61413164cd435fd2b7c38",
+        {
+          "lastSentTime": 1743641723477,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 1000
+  },
+  {
+    "qrData": "0038000600000101030060217A1abc2f0d4dad4e645102TH9104E214",
+    "firstDetected": 1743641799534,
+    "users": [
+      [
+        "Uc3249493df1aa4917550b0dc1c2ad90e",
+        {
+          "lastSentTime": 1743641799534,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0040000600000101030040219055093IFYAAQOG5252C5102TH910490FA",
+    "firstDetected": 1743641988867,
+    "users": [
+      [
+        "Uceda162e0197652411eff885cc0b7ac9",
+        {
+          "lastSentTime": 1743642088833,
+          "messageCount": 2
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0041000600000101030040220015093080027BOR075585102TH9104829C",
+    "firstDetected": 1743642038099,
+    "users": [
+      [
+        "U2a35c219c094e9cc4c53ad11428f2697",
+        {
+          "lastSentTime": 1743642038099,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 40
+  },
+  {
+    "qrData": "0038000600000101030060217A3383453ed7f24fae5102TH91045434",
+    "firstDetected": 1743642237555,
+    "users": [
+      [
+        "Uf1a73bf3deb5153383b89a876863a491",
+        {
+          "lastSentTime": 1743642237555,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015093082057BOR000515102TH91049B3A",
+    "firstDetected": 1743643269630,
+    "users": [
+      [
+        "U2a35c219c094e9cc4c53ad11428f2697",
+        {
+          "lastSentTime": 1743643269630,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 50
+  },
+  {
+    "qrData": "0045000600000101030300224509308204032I000002B97905102TH9104C388",
+    "firstDetected": 1743644673948,
+    "users": [
+      [
+        "U8f7c4d0b4a7ca47f17216c6a3712f949",
+        {
+          "lastSentTime": 1743644673948,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0041000600000101030040220015093091749AOR070585102TH91040AE7",
+    "firstDetected": 1743646787683,
+    "users": [
+      [
+        "U2df575e39f60207670c6f554d17adf86",
+        {
+          "lastSentTime": 1743646787683,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0045000600000101030300224509310760192I000029B97905102TH91043E91",
+    "firstDetected": 1743651549760,
+    "users": [
+      [
+        "U8f7c4d0b4a7ca47f17216c6a3712f949",
+        {
+          "lastSentTime": 1743651549760,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0046000600000101030140225202504032gxNuK2xvHqOKstn55102TH9104796A",
+    "firstDetected": 1743652959242,
+    "users": [
+      [
+        "U01cc1cd6517aa85c485c6aa0c2ad8cbe",
+        {
+          "lastSentTime": 1743653016429,
+          "messageCount": 2
+        }
+      ]
+    ],
+    "amount": 25
+  },
+  {
+    "qrData": "0045000600000101030300224509311113760I000009B97905102TH9104D0C4",
+    "firstDetected": 1743653450464,
+    "users": [
+      [
+        "Ued6c09a29575b6d3d3f0479746d595b2",
+        {
+          "lastSentTime": 1743653450464,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 60
+  },
+  {
+    "qrData": "0045000600000101030300224509311770585I000029B97905102TH9104C1F3",
+    "firstDetected": 1743653474880,
+    "users": [
+      [
+        "U15b271aa9285af2aaf84709c62e7b2b7",
+        {
+          "lastSentTime": 1743653474880,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "0045000600000101030300224509311818740I000005B97905102TH9104E8AF",
+    "firstDetected": 1743653530420,
+    "users": [
+      [
+        "Ubb52e0ff9b15f6e72f02a049c467f321",
+        {
+          "lastSentTime": 1743653530420,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 100
+  },
+  {
+    "qrData": "0038000600000101030060217A64161e6e0d4b45fa5102TH91049C3E",
+    "firstDetected": 1743653645813,
+    "users": [
+      [
+        "Uab3830e436adac3fb4fc981af096ba67",
+        {
+          "lastSentTime": 1743653645813,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 300
+  },
+  {
+    "qrData": "0041000600000101030040220015093111852AOR016975102TH91042DE7",
+    "firstDetected": 1743654077952,
+    "users": [
+      [
+        "Udfd037272a05117318273515b280d189",
+        {
+          "lastSentTime": 1743654077952,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 29
+  },
+  {
+    "qrData": "0041000600000101030040220015093113442BOR033945102TH9104A5AD",
+    "firstDetected": 1743654928944,
+    "users": [
+      [
+        "Ub485392c8b579094f20a940b0f235785",
+        {
+          "lastSentTime": 1743654928944,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 200
+  },
+  {
+    "qrData": "0041000600000101030040220015093140938COR067975102TH91043062",
+    "firstDetected": 1743664371367,
+    "users": [
+      [
+        "U04919bd06d50c5c98ab0fe2241494338",
+        {
+          "lastSentTime": 1743664371367,
+          "messageCount": 1
+        }
+      ]
+    ],
+    "amount": 6.09
+  }
+]

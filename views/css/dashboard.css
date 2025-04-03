@@ -1,0 +1,157 @@
+.container-dashboard {
+  position: absolute;
+  left: 250px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  background-color: #f1f1f1; /* พื้นหลังนวลตา */
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* จัดกลางแนวนอน */
+}
+
+.container-dashboard h1 {
+  text-align: center;
+  color: #2c2c2c;
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.dashboard-card {
+  width: 100%;
+  max-width: 1600px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  background-color: #2c2c2c;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.dashboard-table-wrapper {
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+/* กำหนดความกว้างของแต่ละคอลัมน์ */
+.table-header th:nth-child(1),
+.table-body td:nth-child(1) {
+  width: 8%; /* เวลา */
+}
+
+.table-header th:nth-child(2),
+.table-body td:nth-child(2) {
+  width: 8%; /* ร้าน */
+}
+
+.table-header th:nth-child(3),
+.table-body td:nth-child(3) {
+  width: 8%; /* รูปภาพ */
+}
+
+.table-header th:nth-child(4),
+.table-body td:nth-child(4) {
+  width: 12%; /* กำหนดความกว้างสูงสุด */
+  white-space: nowrap; /* ไม่ให้ข้อความขึ้นบรรทัดใหม่ */
+  overflow: hidden; /* ซ่อนข้อความที่เกิน */
+  text-overflow: ellipsis; /* แสดง ... เมื่อข้อความยาวเกิน */
+}
+
+.table-header th:nth-child(5),
+.table-body td:nth-child(5) {
+  width: 10%; /* สถานะการตรวจ */
+}
+
+.table-header th:nth-child(6),
+.table-body td:nth-child(6) {
+  width: 12%; /* จำนวนเงิน */
+}
+
+.table-header th:nth-child(7),
+.table-body td:nth-child(7) {
+  width: 10%; /* การตอบกลับ */
+}
+
+.table-header th:nth-child(8),
+.table-body td:nth-child(8) {
+  width: 24%; /* กำหนดความกว้างสูงสุด */
+  white-space: nowrap; /* ไม่ให้ข้อความขึ้นบรรทัดใหม่ */
+  overflow: hidden; /* ซ่อนข้อความที่เกิน */
+  text-overflow: ellipsis; /* แสดง ... เมื่อข้อความยาวเกิน */
+}
+
+/* จัดข้อความและรูปภาพ */
+.table-header th,
+.table-body td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 12px 16px; /* ระยะห่างภายในเซลล์ */
+}
+
+.table-body tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Scrollbar */
+.dashboard-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dashboard-table-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.dashboard-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* รูปภาพ */
+.profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ปรับขนาดตาราง */
+.table-header table,
+.table-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* สถานะ */
+.status-success {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-fail {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.status-pending {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+#loading-message {
+  padding: 10px;
+  transition: opacity 0.3s ease;
+}

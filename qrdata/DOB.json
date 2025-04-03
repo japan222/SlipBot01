@@ -1,0 +1,41 @@
+[
+  {
+    "qrData": "00460006000001010301402252025031536Gzr82OCB0LmbArW5102TH9104C449",
+    "firstDetected": 1742135726751,
+    "users": [
+      [
+        "Ucf760fe6716d5297a99441cbe0212230",
+        {
+          "lastSentTime": 1742135726751,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0046000600000101030140225202503139P2e2IOoingYfzrZq5102TH9104709B",
+    "firstDetected": 1742135737868,
+    "users": [
+      [
+        "Ucf760fe6716d5297a99441cbe0212230",
+        {
+          "lastSentTime": 1742135737868,
+          "messageCount": 1
+        }
+      ]
+    ]
+  },
+  {
+    "qrData": "0046000600000101030140225202503133LU9lXT0wF2nptVBe5102TH91043A71",
+    "firstDetected": 1742138859565,
+    "users": [
+      [
+        "Ucf760fe6716d5297a99441cbe0212230",
+        {
+          "lastSentTime": 1742138859565,
+          "messageCount": 1
+        }
+      ]
+    ]
+  }
+]
