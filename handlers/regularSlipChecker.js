@@ -125,29 +125,34 @@ export async function handleRegularSlip(
             const transactionDate = new Date(
                 `${data.transDate.substring(0, 4)}-${data.transDate.substring(4, 6)}-${data.transDate.substring(6, 8)}T${data.transTime}`
             );
-            const daysDifference = (Date.now() - transactionDate.getTime()) / (1000 * 60 * 60 * 24);
+
+            const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+              timeZone: "Asia/Bangkok"
+            }) + " น.";
+            
+            const daysDifference = (now - transactionDate.getTime()) / (1000 * 60 * 60 * 24);
+
+            const timeOnly = transactionDate.toLocaleTimeString("th-TH", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+              timeZone: "Asia/Bangkok"
+            }) + " น.";
   
             const monthsThai = [
                 "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
                 "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
             ];
-  
-            const formattedTransactionDateTime = `${transactionDate.getDate()} ${
-                monthsThai[transactionDate.getMonth()]
-            } ${transactionDate.getFullYear() + 543} ${transactionDate.toLocaleTimeString("th-TH", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-                timeZone: "Asia/Bangkok", // 💥 จุดสำคัญ!
-            })}`;
-            const timeOnly = new Date(now).toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-              timeZone: "Asia/Bangkok"
-            }) + " น.";
-            
-            console.log(timeOnly);
 
+            const formattedTransactionDateTime = `${transactionDate.getDate()} ${
+              monthsThai[transactionDate.getMonth()]
+            } ${transactionDate.getFullYear() + 543} ${timeOnly}`;
+
+            console.log(`🕒 วันที่และเวลาที่ทำรายการ: ${formattedTransactionDateTime}`);
+            
             if (Amount < process.env.MINIMUM_AMOUNT) {
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               broadcastLog(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
@@ -159,7 +164,7 @@ export async function handleRegularSlip(
                 data.receiver?.account.value || data.receiver?.proxy.value
               );
               await reportSlipResultToAPI({
-                time: timeOnly,
+                time: thaiTime,
                 shop: prefix,
                 lineName,
                 image,
@@ -183,7 +188,7 @@ export async function handleRegularSlip(
                 data.receiver?.account.value || data.receiver?.proxy.value
               );
               await reportSlipResultToAPI({
-                time: timeOnly,
+                time: thaiTime,
                 shop: prefix,
                 lineName,
                 image,
@@ -206,7 +211,7 @@ export async function handleRegularSlip(
               data.receiver?.account.value || data.receiver?.proxy.value
             );
             await reportSlipResultToAPI({
-              time: timeOnly,
+              time: thaiTime,
               shop: prefix,
               lineName,
               image,

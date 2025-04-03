@@ -84,11 +84,14 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
   const userId = event.source.userId;
   const messageId = event.message.id;
   const now = Date.now();
+  console.log("⏰ เวลาตอนนี้ (UTC):", now);
   const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     timeZone: "Asia/Bangkok"
   });
+  console.log("⏰ เวลาตอนนี้ (ไทย):", thaiTime);
   const eventId = `${event.message?.id || event.timestamp}`;
 
     // ✅ ตรวจสอบว่า event นี้เคยถูกประมวลผลหรือยัง
@@ -154,14 +157,14 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
               const lastSentTime = userRecord.lastSentTime || 0;
               const sameMessageCount = userRecord.messageCount || 0;
           
-              if (thaiTime - lastSentTime < sameQrTimeLimit) {
+              if (now - lastSentTime < sameQrTimeLimit) {
                 if (sameMessageCount < maxMessagesSamePerUser) {
                     console.log(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
                     broadcastLog(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
                     await sendMessageWait(event.replyToken, client);
 
                     qrInfo.users.set(userId, {
-                        lastSentTime: thaiTime,
+                        lastSentTime: now,
                         messageCount: sameMessageCount + 1
                     });
           
@@ -194,25 +197,27 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
             return sendMessageSame(
               event.replyToken, 
               client, 
-              new Date(qrInfo.firstDetected).toLocaleString("th-TH"), 
+              new Date(qrInfo.firstDetected).toLocaleString("th-TH", {
+                timeZone: "Asia/Bangkok"
+              }) + " น.",
               qrData
           );
           }
 
-          if (thaiTime - userInfo.lastSentTime < timeLimit && userInfo.qrMessageCount >= maxMessagesPerUser) {
+          if (now - userInfo.lastSentTime < timeLimit && userInfo.qrMessageCount >= maxMessagesPerUser) {
             console.log(`⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`);
             broadcastLog(`⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`);
             return;
           }
             userMessageCount.set(userId, {
-              lastSentTime: thaiTime,
+              lastSentTime: now,
               qrMessageCount: userInfo.qrMessageCount + 1
           });
 
           const qrEntry = {
-            firstDetected: thaiTime,
+            firstDetected: now,
             users: new Map([
-              [userId, { lastSentTime: thaiTime, messageCount: 1 }]
+              [userId, { lastSentTime: now, messageCount: 1 }]
             ])
           };
 
