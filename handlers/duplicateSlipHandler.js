@@ -84,6 +84,11 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
   const userId = event.source.userId;
   const messageId = event.message.id;
   const now = Date.now();
+  const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Bangkok"
+  });
   const eventId = `${event.message?.id || event.timestamp}`;
 
     // ✅ ตรวจสอบว่า event นี้เคยถูกประมวลผลหรือยัง
@@ -149,14 +154,14 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
               const lastSentTime = userRecord.lastSentTime || 0;
               const sameMessageCount = userRecord.messageCount || 0;
           
-              if (now - lastSentTime < sameQrTimeLimit) {
+              if (thaiTime - lastSentTime < sameQrTimeLimit) {
                 if (sameMessageCount < maxMessagesSamePerUser) {
                     console.log(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
                     broadcastLog(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
                     await sendMessageWait(event.replyToken, client);
 
                     qrInfo.users.set(userId, {
-                        lastSentTime: now,
+                        lastSentTime: thaiTime,
                         messageCount: sameMessageCount + 1
                     });
           
@@ -194,20 +199,20 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
           );
           }
 
-          if (now - userInfo.lastSentTime < timeLimit && userInfo.qrMessageCount >= maxMessagesPerUser) {
+          if (thaiTime - userInfo.lastSentTime < timeLimit && userInfo.qrMessageCount >= maxMessagesPerUser) {
             console.log(`⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`);
             broadcastLog(`⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`);
             return;
           }
             userMessageCount.set(userId, {
-              lastSentTime: now,
+              lastSentTime: thaiTime,
               qrMessageCount: userInfo.qrMessageCount + 1
           });
 
           const qrEntry = {
-            firstDetected: now,
+            firstDetected: thaiTime,
             users: new Map([
-              [userId, { lastSentTime: now, messageCount: 1 }]
+              [userId, { lastSentTime: thaiTime, messageCount: 1 }]
             ])
           };
 
@@ -269,7 +274,8 @@ function getCurrentTimeOnly() {
   return new Date().toLocaleTimeString("th-TH", {
     hour: "2-digit",
     minute: "2-digit",
-  }) + " น."
+    timeZone: "Asia/Bangkok"
+  }) + " น.";
 }
 
 function loadBankAccounts() {

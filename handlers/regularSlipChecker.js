@@ -137,11 +137,16 @@ export async function handleRegularSlip(
             } ${transactionDate.getFullYear() + 543} ${transactionDate.toLocaleTimeString("th-TH", {
                 hour: "2-digit",
                 minute: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Bangkok", // 💥 จุดสำคัญ!
             })}`;
-            const timeOnly = new Date().toLocaleTimeString("th-TH", {
+            const timeOnly = new Date(now).toLocaleTimeString("th-TH", {
               hour: "2-digit",
-              minute: "2-digit"
+              minute: "2-digit",
+              timeZone: "Asia/Bangkok"
             }) + " น.";
+            
+            console.log(timeOnly);
 
             if (Amount < process.env.MINIMUM_AMOUNT) {
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
