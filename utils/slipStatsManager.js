@@ -104,7 +104,7 @@ export function saveSlipResults(data) {
 
 export async function reportSlipResultToAPI(result) {
     try {
-      await axios.post("http://localhost:9000/api/slip-results", result);
+      await axios.post("http://localhost:2600/api/slip-results", result);
     } catch (error) {
       console.error("❌ ไม่สามารถส่งข้อมูลผลสลิปไปยัง API:", error.message);
     }
