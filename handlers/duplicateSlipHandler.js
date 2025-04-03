@@ -84,14 +84,6 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
   const userId = event.source.userId;
   const messageId = event.message.id;
   const now = Date.now();
-  console.log("⏰ เวลาตอนนี้ (UTC):", now);
-  const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZone: "Asia/Bangkok"
-  });
-  console.log("⏰ เวลาตอนนี้ (ไทย):", thaiTime);
   const eventId = `${event.message?.id || event.timestamp}`;
 
     // ✅ ตรวจสอบว่า event นี้เคยถูกประมวลผลหรือยัง

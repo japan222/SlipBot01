@@ -123,7 +123,7 @@ export async function handleRegularSlip(
             const fromBank = getBankName(data.sendingBank) || "ไม่ระบุ";
             const toBank = getBankName(data.receivingBank) || "ไม่ระบุ";
             const transactionDate = new Date(
-                `${data.transDate.substring(0, 4)}-${data.transDate.substring(4, 6)}-${data.transDate.substring(6, 8)}T${data.transTime}`
+              `${data.transDate.slice(0, 4)}-${data.transDate.slice(4, 6)}-${data.transDate.slice(6, 8)}T${data.transTime}+07:00`
             );
 
             const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
@@ -151,7 +151,6 @@ export async function handleRegularSlip(
               monthsThai[transactionDate.getMonth()]
             } ${transactionDate.getFullYear() + 543} ${timeOnly}`;
 
-            console.log(`🕒 วันที่และเวลาที่ทำรายการ: ${formattedTransactionDateTime}`);
             
             if (Amount < process.env.MINIMUM_AMOUNT) {
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
