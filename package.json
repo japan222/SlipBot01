@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "postinstall": "npm rebuild canvas"
+    "dev": "nodemon index.js"
   },
   "engines": {
     "node": "18.x"
