@@ -1,5 +1,5 @@
-import { createCanvas, loadImage } from "canvas";
 import jsQR from "jsqr";
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 // ✅ ตรวจสอบว่าเป็น QR Code สำหรับการชำระเงินหรือไม่
 function isPaymentQR(qrData) {
