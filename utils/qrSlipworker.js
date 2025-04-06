@@ -24,7 +24,7 @@ const keywords = [
   
     // กลุ่ม 5: ชื่อธนาคาร
     "scb", "ไทยพาณิชย์", "kbank", "กสิกรไทย", "krungthai", "กรุงไทย", "กรุงเทพ", "bangkok bank",
-    "ttb", "tmb", "ธนชาต", "ธนาคาร", "ออมสิน", "gsb", "uob", "citi", "ktb", "bay", "cimb", "กรุงศรี",
+    "ttb", "tmb", "ธนชาต", "ออมสิน", "gsb", "uob", "citi", "ktb", "bay", "cimb", "กรุงศรี",
   
     // กลุ่ม 6: คำที่มักอยู่บนสลิป / ระบบ Mobile Banking
     "slip", "verified", "qr", "คิวอาร์โค้ด", "สแกนตรวจสอบสลิป", "ตรวจสอบสถานะ", "mobile banking", "online banking", "ibanking",
