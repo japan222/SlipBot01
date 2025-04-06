@@ -51,7 +51,6 @@ app.get("/api/logs", (req, res) => {
 
 // ฟังก์ชันสำหรับส่ง Logs ไปยัง Clients
 export function broadcastLog(message) {
-  // ✅ ใช้ toLocaleTimeString พร้อมระบุ timeZone ให้ชัดว่าเป็นเวลาไทย
   const timestamp = new Date().toLocaleTimeString("th-TH", {
     hour: "2-digit",
     minute: "2-digit",
@@ -61,11 +60,13 @@ export function broadcastLog(message) {
 
   const logEntry = `[${timestamp}] ${message}`;
 
-  // เก็บ log ลงในประวัติ และรักษาจำนวนให้ไม่เกิน MAX_LOGS
+  // ✅ เก็บ log ลงในประวัติ
+  logHistory.push(logEntry);
+  if (logHistory.length > MAX_LOGS) {
+    logHistory.splice(0, logHistory.length - MAX_LOGS);
+  }
 
-  
-
-  // ส่ง log ไปยัง clients
+  // ✅ ส่ง log ไปยัง clients แบบ real-time
   const data = `data: ${logEntry}\n\n`;
   logClients.forEach(client => {
     try {
