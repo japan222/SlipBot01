@@ -1,3 +1,5 @@
+import { broadcastLog } from "../index.js";
+
 export async function sendMessageWait(replyToken, client) {
     try {
         // ✅ กำหนดข้อความที่เป็นไปได้
@@ -22,7 +24,9 @@ export async function sendMessageWait(replyToken, client) {
         });
 
         console.log(`ตอบกลับแล้ว: ${randomMessage}`);
+        broadcastLog(`ตอบกลับแล้ว: ${randomMessage}`); // ส่งข้อความไปยังฟังก์ชัน broadcastLog
     } catch (err) {
         console.error("เกิดข้อผิดพลาดในการส่งข้อความแจ้งเตือนซ้ำ:", err.message || err);
+        broadcastLog("เกิดข้อผิดพลาดในการส่งข้อความแจ้งเตือนซ้ำ:", err.message || err); // ส่งข้อความไปยังฟังก์ชัน broadcastLog
     }
 }

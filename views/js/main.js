@@ -379,7 +379,7 @@ function openShopInfoModal(shop) {
             <li>
             <strong>${line.linename}</strong><br>
             <span class="webhook-path">
-                <span class="no-select-arrow"><strong> Webhook ➡️ </strong></span>/webhook/${shop.prefix}/line${index + 1}.bot
+                <span class="no-select-arrow"><strong> Webhook ➡️ </strong></span>https://slipchecker.onrender.com/webhook/${shop.prefix}/line${index + 1}.bot
             </span>
             </li>
           `).join("")}
@@ -585,7 +585,7 @@ async function addShop() {
         alert("เพิ่มร้านค้าสำเร็จ!");
         window.location.reload(); // รีเฟรชหน้า
     } else {
-        showAlertMessage("เกิดข้อผิดพลาด: " + result.message, "alertMessageShop", false);
+        showAlertMessage(result.message, "alertMessageShop", false);
     }
 }
 

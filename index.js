@@ -20,9 +20,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const clients = [];
-const MAX_LOGS = 50;
+const MAX_LOGS = 200;
 const logHistory = [];
 const logClients = [];
+const SLIP_STATS_PATH = path.join(__dirname, "stats", "slipStats.json");
 
 // Endpoint สำหรับส่ง Logs แบบเรียลไทม์
 app.get("/api/logs", (req, res) => {
@@ -50,14 +51,19 @@ app.get("/api/logs", (req, res) => {
 
 // ฟังก์ชันสำหรับส่ง Logs ไปยัง Clients
 export function broadcastLog(message) {
-  const timestamp = new Date().toLocaleTimeString("th-TH");
+  // ✅ ใช้ toLocaleTimeString พร้อมระบุ timeZone ให้ชัดว่าเป็นเวลาไทย
+  const timestamp = new Date().toLocaleTimeString("th-TH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Bangkok"
+  });
+
   const logEntry = `[${timestamp}] ${message}`;
 
   // เก็บ log ลงในประวัติ และรักษาจำนวนให้ไม่เกิน MAX_LOGS
-  logHistory.push(logEntry);
-  if (logHistory.length > MAX_LOGS) {
-    logHistory.splice(0, logHistory.length - MAX_LOGS);
-  }
+
+  
 
   // ส่ง log ไปยัง clients
   const data = `data: ${logEntry}\n\n`;
@@ -126,13 +132,8 @@ app.post("/api/slip-results", (req, res) => {
   newSlip.createdAt = new Date();
 
   slipResults.push(newSlip);
-
   removeOldSlips(); // ลบเก่าออกก่อน
-
   saveSlipResults(slipResults); // ✅ บันทึกไฟล์
-
-  console.log("✅ บันทึกข้อมูล slip_results.json แล้ว"); // ✅ เพิ่มตรงนี้เพื่อให้ขึ้นทันที
-
   res.status(201).send({ message: "บันทึกแล้ว" });
 
   const data = `data: ${JSON.stringify(newSlip)}\n\n`;
@@ -140,7 +141,6 @@ app.post("/api/slip-results", (req, res) => {
 });
 
 app.get("/api/slip-results", (req, res) => {
-  console.log("📦 ส่ง slip ทั้งหมด:", slipResults.length);
   removeOldSlips(); // ลบ + บันทึก
   res.json(slipResults);
 });
@@ -167,7 +167,7 @@ function isAuthenticated(req, res, next) {
 
 // ✅ Route: หน้า login
 app.get("/login", (req, res) => {
-  if (req.session?.user) return res.redirect("/index.html");
+  if (req.session?.user) return res.redirect("/"); // 👈 เปลี่ยนเป็น /
   res.sendFile(path.join(__dirname, "public", "login.html"));
 });
   
@@ -186,7 +186,7 @@ app.post("/login", (req, res) => {
 
   if (role) {
     req.session.user = { username, role };
-    return res.redirect("/index.html");
+    return res.redirect("/");
   }
 
   return res.redirect("/login?error=1");
@@ -201,12 +201,9 @@ app.get("/logout", (req, res) => {
 
 // ✅ เข้าหน้าหลัก index ต้อง login
 app.get("/", isAuthenticated, (req, res) => {
-  res.redirect("/index.html");
-});
-
-app.get("/index.html", isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, "views", "index.html"));
 });
+
 
 // ✅ สำหรับโหลดเนื้อหาย่อย เช่น main.html ฯลฯ
 app.get("/page/:name", isAuthenticated, (req, res) => {
@@ -278,32 +275,44 @@ app.get('/api/quota', async (req, res) => {
     const { name, prefix } = req.body;
     
     if (!name || !prefix) {
-        return res.status(400).json({ success: false, message: "กรุณากรอกข้อมูลให้ครบ" });
-    }
+      return res.status(400).json({ success: false, message: "กรุณากรอกข้อมูลให้ครบ" });
+  }
 
-    try {
-        // อ่านข้อมูลร้านค้าปัจจุบัน
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
+  try {
+      // อ่านข้อมูลร้านค้าปัจจุบัน
+      const rawData = fs.readFileSync("./line_shops.json", "utf-8");
+      let data = JSON.parse(rawData);
 
-        // ตรวจสอบว่ามี prefix ซ้ำหรือไม่
-        if (data.shops.some(shop => shop.prefix === prefix)) {
-            return res.status(400).json({ success: false, message: "Prefix นี้ถูกใช้ไปแล้ว" });
-        }
+      // ตรวจสอบว่ามี prefix ซ้ำหรือไม่
+      if (data.shops.some(shop => shop.prefix === prefix)) {
+          return res.status(400).json({ success: false, message: "Prefix นี้ถูกใช้ไปแล้ว" });
+      }
+
+      // ✅ ตรวจสอบ prefix ว่าอยู่ใน slipStats หรือไม่
+      const prefixStatsRaw = fs.readFileSync(SLIP_STATS_PATH, "utf-8");
+      const prefixStats = JSON.parse(prefixStatsRaw);
+
+      if (!prefixStats.hasOwnProperty(prefix)) {
+          return res.status(400).json({
+              success: false,
+              message: `ไม่สามารถเพิ่มร้านได้: prefix '${prefix}' ไม่อยู่ในระบบ`
+          });
+      }
 
         // เพิ่มร้านค้าใหม่
         const newShop = {
             name,
             prefix,
             lines: [],
-            status: false // ร้านใหม่เริ่มต้นที่ปิดอยู่
+            status: false, // ร้านใหม่เริ่มต้นที่ปิดอยู่
+            slipCheckOption: "duplicate", // ตัวเลือกตรวจสอบสลิปเริ่มต้นเป็น duplicate
         };
         data.shops.push(newShop);
-
         // บันทึกข้อมูลลงไฟล์
         fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
         
         res.json({ success: true });
+        restartWebhooks();
     } catch (error) {
         console.error("Error adding shop:", error);
         res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มร้านค้า" });
@@ -455,6 +464,7 @@ app.post("/api/add-line", (req, res) => {
 
         // ✅ บันทึกข้อมูลร้านค้าลงไฟล์
         fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
+        restartWebhooks();
 
         res.json({ success: true, message: "เพิ่มบัญชี LINE สำเร็จ!" });
     } catch (error) {
@@ -564,9 +574,6 @@ const getActiveShops = () => {
     return activeShops;
   };
   
-// ตรวจสอบร้านค้าที่ทำงาน
-const activeShops = getActiveShops();
-console.log("📌 ร้านค้าที่กำลังทำงาน:", JSON.stringify(activeShops, null, 2));
 
 function setCorrectSignature(channelSecret) {
     return (req, res, next) => {
@@ -603,6 +610,7 @@ const setupWebhooks = () => {
     shopData.forEach((shop) => {
         shop.lines.forEach((lineAccount, index) => {
             const prefix = shop.prefix;
+            const lineName = lineAccount.linename; // ✅ แก้ตรงนี้
             const lineConfig = {
                 channelAccessToken: String(lineAccount.access_token),
                 channelSecret: String(lineAccount.secret_token)
@@ -619,7 +627,7 @@ const setupWebhooks = () => {
               async (req, res) => {
                 const events = req.body.events || [];
                 await Promise.all(
-                  events.map(async (event) => await handleEvent(event, client, prefix ))
+                  events.map(async (event) => await handleEvent(event, client, prefix, lineName ))
                 );
                 res.status(200).send("OK");
                 }

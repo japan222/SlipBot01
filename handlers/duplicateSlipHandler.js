@@ -3,7 +3,7 @@ import { sendMessageWait } from "../reply/text_reply.js";
 import { sendMessageSame } from "../reply/same_reply.js";
 import fs from "fs";
 import { loadQRDatabaseFromFile, saveQRDatabaseToFile } from "../qrdata/qrData.js";
-import { scan_qr_code, streamToBuffer } from "../utils/qrSlipworker.js";
+import { analyzeSlipImage, streamToBuffer } from "../utils/qrSlipworker.js";
 import { handleRegularSlip } from "../handlers/regularSlipChecker.js";
 import { getLineProfile } from "../utils/getLineProfile.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
@@ -66,7 +66,7 @@ const userProcessingQueue = new Map(); // คิวการประมวล�
 const userMessageCount = new Map(); // เก็บจำนวนสลิปที่ผู้ใช้ส่ง
 const processedEvents = new Set(); // เก็บ event ที่ประมวลผลแล้ว
 
-export async function handleEvent(event, client, prefix, qrDatabase) {
+export async function handleEvent(event, client, prefix, linename, qrDatabase) {
   // ✅ โหลดข้อมูลร้านค้า
   const rawData = fs.readFileSync("./line_shops.json", "utf-8");
   const shopData = JSON.parse(rawData).shops || [];
@@ -75,12 +75,10 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
   // ✅ ตรวจสอบว่าร้านค้านี้เปิดใช้งานหรือไม่
   if (!shop || !shop.status) return;
   
-  console.log(`📩 ข้อความ: ${event.message?.type || event.type} จาก ${prefix}`);
-  broadcastLog(`📩 ข้อความ: ${event.message?.type || event.type} จาก ${prefix}`);
+  console.log(`📩 ข้อความ: ${event.message?.type || event.type} จาก ${linename}`);
+  broadcastLog(`📩 ข้อความ: ${event.message?.type || event.type} จาก ${linename}`);
 
   if (event.type !== "message" || event.message.type !== "image") return;
-  console.log(`maxProcessingPerUser: ${maxProcessingPerUser}`);
-  
   const userId = event.source.userId;
   const messageId = event.message.id;
   const now = Date.now();
@@ -113,25 +111,42 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
     // ✅ เพิ่มงานเข้าไปในคิว
     userQueue.push(async () => {
       try {
-          console.log(`🔄 กำลังประมวลผลสลิปของ ${userId} (${userQueue.length} รายการในคิว)`);
-          broadcastLog(`🔄 กำลังประมวลผลสลิปของ ${userId} (${userQueue.length} รายการในคิว)`);
+          console.log(`🔄 กำลังประมวลรูปภาพของ ${userId} (${userQueue.length} รายการในคิว)`);
+          broadcastLog(`🔄 กำลังประมวลรูปภาพของ ${userId} (${userQueue.length} รายการในคิว)`);
           const stream = await client.getMessageContent(messageId);
           const buffer = await streamToBuffer(stream);
 
-          const qrData = await scan_qr_code(buffer);
+          const qrData = await analyzeSlipImage(buffer);
           const profile = await getLineProfile(userId, shop.lines[0].access_token);
 
           const lineName = profile?.displayName || "-";
           const image = profile?.pictureUrl || "";
-          console.log(`📥 QR Code ที่สแกนได้:`, qrData);
-          broadcastLog(`📥 QR Code ที่สแกนได้: ${qrData}`);
 
-          // ✅ ตรวจสอบว่าเป็นภาพสลิปหรือไม่
           if (!qrData) {
-            console.log("❌ ไม่พบ QR Code ในภาพนี้");
-            broadcastLog("❌ ไม่พบ QR Code ในภาพนี้");
+            console.log("❌ ไม่ใช่ภาพสลิป");
+            broadcastLog("❌ ไม่ใช่ภาพสลิป");
             return;
           }
+        
+          // ✅ กรณีพบว่าเป็นสลิปต้องสงสัย
+          if (qrData.suspicious) {
+            console.log("⚠️ พบสลิปต้องสงสัย ( อาจเป็นภาพสลิป แต่ไม่มี QRcode หรือ ปลอมสลิป )");
+            broadcastLog("⚠️ พบสลิปต้องสงสัย ( อาจเป็นภาพสลิป แต่ไม่มี QRcode หรือ ปลอมสลิป )");
+            await reportSlipResultToAPI({
+              time: getCurrentTimeOnly(),  // เพิ่ม () เพื่อเรียกใช้ฟังก์ชัน
+              shop: linename,
+              lineName,
+              image,
+              status: "พบสลิปต้องสงสัย ( อาจเป็นภาพสลิป แต่ไม่มี QRcode หรือ ปลอมสลิป )",
+              response: "ไม่ได้ตอบกลับ",
+          });
+            return;
+          }
+          
+          // ✅ กรณีสลิปถูกต้องและมี QR Code
+          console.log("📥 QR Code ที่สแกนได้:", qrData);
+          broadcastLog(`📥 QR Code ที่สแกนได้: ${qrData}`);
+          
           
           if (!userMessageCount.has(userId)) {
             userMessageCount.set(userId, { lastSentTime: 0, qrMessageCount: 0 });
@@ -153,6 +168,16 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
                 if (sameMessageCount < maxMessagesSamePerUser) {
                     console.log(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
                     broadcastLog(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
+                    await reportSlipResultToAPI({
+                      time: getCurrentTimeOnly(),  // เพิ่ม () เพื่อเรียกใช้ฟังก์ชัน
+                      shop: linename,
+                      lineName,
+                      image,
+                      status: "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง",
+                      response: "ตอบกลับ 'รอสักครู่'",
+                      amount: qrInfo.amount,
+                      ref: qrData
+                    });
                     await sendMessageWait(event.replyToken, client);
 
                     qrInfo.users.set(userId, {
@@ -170,6 +195,7 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
             }
         }
             // ✅ ถ้าเกิน 10 นาที ให้ตรวจเป็น "🔴 พบสลิป QR Code ซ้ำ ❌"
+            const tranRef = qrData.length > 20 ? qrData.slice(-20) : qrData;
             console.log(`🔴 พบสลิป QR Code ซ้ำ ❌`);
             broadcastLog(`🔴 พบสลิป QR Code ซ้ำ ❌`);
             saveQRDatabaseToFile(prefix, qrDatabase);
@@ -177,7 +203,7 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
             // รายงานผลก่อน
             await reportSlipResultToAPI({
                 time: getCurrentTimeOnly(),  // เพิ่ม () เพื่อเรียกใช้ฟังก์ชัน
-                shop: prefix,
+                shop: linename,
                 lineName,
                 image,
                 status: "สลิปซ้ำเดิม",
@@ -192,7 +218,7 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
               new Date(qrInfo.firstDetected).toLocaleString("th-TH", {
                 timeZone: "Asia/Bangkok"
               }) + " น.",
-              qrData
+              tranRef
           );
           }
 
@@ -205,7 +231,7 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
               lastSentTime: now,
               qrMessageCount: userInfo.qrMessageCount + 1
           });
-
+          const tranRef = qrData.length > 20 ? qrData.slice(-20) : qrData;
           const qrEntry = {
             firstDetected: now,
             users: new Map([
@@ -229,14 +255,14 @@ export async function handleEvent(event, client, prefix, qrDatabase) {
               userInfo,
               bankAccounts,
               lineName,
-              image
+              image,
+              linename,
+              tranRef
             );
 
             // ✅ บันทึกค่า amount หากได้รับจาก SlipOK
             if (slipData && slipData.amount !== undefined) {
               qrEntry.amount = slipData.amount;
-              console.log(`✅ บันทึกค่า Amount: ${slipData.amount}`);
-              broadcastLog(`✅ บันทึกค่า Amount: ${slipData.amount}`);
             }
           }
   

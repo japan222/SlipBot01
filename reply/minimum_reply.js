@@ -1,3 +1,5 @@
+import { broadcastLog } from "../index.js";
+
 /**
  * ฟังก์ชันสำหรับส่งข้อความ Flex Message ตอบกลับกรณีสลิปถูกต้อง
  * @param {string} replyToken - Token สำหรับการตอบกลับ LINE Messaging API
@@ -278,7 +280,9 @@ export async function sendMessageMinimum(replyToken, client, formattedTransactio
     // ส่งข้อความผ่าน LINE Messaging API
     await client.replyMessage(replyToken, { type: "flex", altText: "🟡 สลิปยอดเงินต่ำกว่ากำหนด ⚠", contents: flexMessage });
     console.log("ตอบกลับแล้ว ยอดเงินต่ำกว่าที่กำหนด");
+    broadcastLog("ตอบกลับแล้ว ยอดเงินต่ำกว่าที่กำหนด");
 } catch (err) {
     console.error("เกิดข้อผิดพลาดในการส่งข้อความ Flex Message:", err.message || err);
+    broadcastLog("เกิดข้อผิดพลาดในการส่งข้อความ Flex Message:", err.message || err);
 }
 }

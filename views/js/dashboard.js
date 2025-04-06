@@ -28,13 +28,13 @@ function renderSlipResults(start, end) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.time || "-"}</td>
-      <td>${r.shop || "-"}</td>
+      <td title="${r.shop || "-"}">${truncateText(r.shop || "-", 12)}</td>
       <td><img src="${r.image || 'https://placehold.co/40x40?text=No+Img'}" class="profile-img" /></td>
       <td title="${r.lineName || "-"}">${truncateText(r.lineName || "-", 12)}</td>
       <td class="${getStatusClass(r.status)}">${r.status || "-"}</td>
       <td>${r.amount || "-"}</td>
       <td>${r.response || "-"}</td>
-      <td title="${r.ref || "-"}">${truncateText(r.ref || "-", 20)}</td>
+      <td title="${r.ref || "-"}">${truncateEndText(r.ref || "-", 20)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -50,14 +50,23 @@ function renderSlipResults(start, end) {
 
 function getStatusClass(status) {
   switch (status) {
-    case "สลิปถูกต้อง": return "status-success";
+    case "สลิปถูกต้อง":
+      return "status-success";
+
     case "สลิปซ้ำเดิม":
-    case "บัญชีปลายทางผิด": return "status-fail";
-    case "สลิปยอดเงินต่ำ": 
-    case "รอตรวจสอบ":
-    default: return "status-pending";
+    case "บัญชีปลายทางผิด":
+      return "status-fail";
+
+    case "สลิปยอดเงินต่ำ":
+    case "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง":
+    case "ใช้เวลาตรวจสอบนานเกินไป":
+    case "พบสลิปต้องสงสัย ( อาจเป็นภาพสลิป แต่ไม่มี QRcode หรือ ปลอมสลิป )":
+    case "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ":
+    default:
+      return "status-pending";
   }
 }
+
 
 function setupScrollListener() {
   const container = document.querySelector(".dashboard-table-wrapper");
@@ -89,7 +98,11 @@ function setupScrollListener() {
 }
 
 function truncateText(text, maxLength) {
-  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  return text.length > maxLength ? text.substring(0, maxLength) + ".." : text;
+}
+
+function truncateEndText(text, maxLength) {
+  return text.length > maxLength ? text.slice(-maxLength) : text;
 }
 
 // SSE สำหรับสลิปใหม่
@@ -112,13 +125,13 @@ function connectSSE() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${newSlip.time || "-"}</td>
-          <td>${newSlip.shop || "-"}</td>
+          <td title="${newSlip.shop || "-"}">${truncateText(newSlip.shop || "-", 12)}</td>
           <td><img src="${newSlip.image || '/images/no-image.png'}" class="profile-img" /></td>
           <td title="${newSlip.lineName || "-"}">${truncateText(newSlip.lineName || "-", 12)}</td>
           <td class="${getStatusClass(newSlip.status)}">${newSlip.status || "-"}</td>
           <td>${newSlip.amount || "-"}</td>
           <td>${newSlip.response || "-"}</td>
-          <td title="${newSlip.ref || "-"}">${truncateText(newSlip.ref || "-", 20)}</td>
+          <td title="${newSlip.ref || "-"}">${truncateEndText(newSlip.ref || "-", 20)}</td>
         `;
         tbody.insertBefore(tr, tbody.firstChild);
       }

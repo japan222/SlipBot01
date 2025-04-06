@@ -2,7 +2,7 @@ import fs from 'fs';
 
 const DEFAULT_SETTINGS = {
   timeLimit: 120000,          // 120 seconds * 1000
-  sameQrTimeLimit: 1200000,   // 1200 seconds * 1000
+  sameQrTimeLimit: 3600000,   // 1200 seconds * 1000
   maxMessagesPerUser: 3,
   maxMessagesSamePerUser: 2,
   maxProcessingPerUser: 2

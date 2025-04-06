@@ -10,6 +10,7 @@ import bankCodeMapping from "../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../utils/slipStatsManager.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
 import { broadcastLog } from "../index.js";
+import { isAccountNumberMatch } from "../utils/accountUtils.js";
 
 /**
  * ฟังก์ชันสำหรับตรวจสอบสลิปแบบปกติ
@@ -35,7 +36,9 @@ export async function handleRegularSlip(
   userInfo,
   bankAccounts, // ✅ รับเข้ามา
   lineName,
-  image
+  image,
+  linename,
+  tranRef
 ) {
   try {
     const now = Date.now();
@@ -67,58 +70,53 @@ export async function handleRegularSlip(
             const accountData = bankAccounts[prefix] || [];
 
             if (accountData.length === 0) {
-              // ✅ คัดเฉพาะบัญชีที่ active
-              const activeAccounts = accountData.filter(account => account.status);
-
-              if (activeAccounts.length === 0) {
-                console.log("ข้ามการตรวจสอบบัญชี ไม่มได้ระบุบัญชีที่ใช้ตรวจสอบ.... ");
             } else {
-          
-                const receiverName = cleanReceiverName(data.receiver?.displayName || "");
+              const activeAccounts = accountData.filter(account => account.status === true);
+            
+              if (activeAccounts.length === 0) {
+                console.log("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่ใช้ตรวจสอบ.... ");
+              } else {
                 const receiverAccount = data.receiver?.account?.value || data.receiver?.proxy?.value || "ไม่ระบุ";
                 let accountMatched = false;
-
+            
                 for (const account of activeAccounts) {
-                    if (isNameMatch(receiverName, account)) {  // 🔥 เช็คชื่อ
-                        console.log(`✅ ชื่อตรงกับบัญชี: ${account.THname} / ${account.ENGname}`);
-
-                        if (isAccountNumberMatch(receiverAccount, account.account)) {  // 🔥 เช็คเลขบัญชี
-                            console.log(`✅ หมายเลขบัญชีตรงกัน: ${receiverAccount}`);
-                            accountMatched = true;
-                            break;  // ✅ หยุดทันทีถ้าตรง
-                        } else {
-                            console.log(`❌ หมายเลขบัญชีไม่ตรงกับ: ${receiverAccount}`);
-                        }
-                    }
+                  console.log(`✅ กำลังตรวจสอบบัญชี: ${receiverAccount} กับ ${account.account}`);
+                  if (isAccountNumberMatch(receiverAccount, account.account)) {
+                    console.log(`🎯 หมายเลขบัญชีตรงกับ: ${receiverAccount}`);
+                    accountMatched = true;
+                    break; // ✅ หยุดทันทีเมื่อเจอเลขบัญชีที่ตรงกัน
+                  } else {
+                    console.log(`❌ หมายเลขบัญชีไม่ตรงกับ: ${receiverAccount}`);
+                  }
                 }
-          
+
                 if (!accountMatched) {
                   console.log(`🔴 พบสลิปบัญชีปลายทางไม่ถูกต้อง ❌`);
                   broadcastLog(`🔴 พบสลิปบัญชีปลายทางไม่ถูกต้อง ❌`);
                   updateSlipStats(prefix, "ตรวจสลิปปลายทางไม่ถูกต้องไปแล้ว", data.amount);
-                  await sendMessageWrong(replyToken,client,
-                    data.transRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
+                  await sendMessageWrong(replyToken, client,
+                    tranRef, data.amount, data.sender?.displayName || "ไม่ระบุ",
                     data.sender?.account.value || data.sender?.proxy.value,
                     data.receiver?.displayName || "ไม่ระบุ",
-                    data.receiver?.account.value || data.receiver?.proxy.value      
+                    data.receiver?.account.value || data.receiver?.proxy.value
                   );
                   await reportSlipResultToAPI({
                     time: new Date().toLocaleTimeString("th-TH", {
                       hour: "2-digit",
                       minute: "2-digit"
                     }) + " น.",
-                    shop: prefix,
+                    shop: linename,
                     lineName,
                     image,
                     status: "บัญชีปลายทางผิด",
                     response: "ตอบกลับแล้ว",
                     amount: Amount,
-                    ref: data.transRef
+                    ref: data.qrcodeData
                   });
                   return { amount: Amount };
                 }
             }
-        }
+          }
 
             const fromBank = getBankName(data.sendingBank) || "ไม่ระบุ";
             const toBank = getBankName(data.receivingBank) || "ไม่ระบุ";
@@ -132,7 +130,7 @@ export async function handleRegularSlip(
               hour12: false,
               timeZone: "Asia/Bangkok"
             }) + " น.";
-            
+
             const daysDifference = (now - transactionDate.getTime()) / (1000 * 60 * 60 * 24);
 
             const timeOnly = transactionDate.toLocaleTimeString("th-TH", {
@@ -150,27 +148,26 @@ export async function handleRegularSlip(
             const formattedTransactionDateTime = `${transactionDate.getDate()} ${
               monthsThai[transactionDate.getMonth()]
             } ${transactionDate.getFullYear() + 543} ${timeOnly}`;
-
             
             if (Amount < process.env.MINIMUM_AMOUNT) {
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               broadcastLog(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               updateSlipStats(prefix, "ตรวจสลิปยอดเงินต่ำกว่าที่กำหนดไปแล้ว", Amount);
               await sendMessageMinimum(replyToken,client,formattedTransactionDateTime,
-                data.transRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
+                tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
                 fromBank ,data.sender?.account.value || data.sender?.proxy.value,
                 data.receiver?.displayName || "ไม่ระบุ", toBank,
                 data.receiver?.account.value || data.receiver?.proxy.value
               );
               await reportSlipResultToAPI({
                 time: thaiTime,
-                shop: prefix,
+                shop: linename,
                 lineName,
                 image,
                 status: "สลิปยอดเงินต่ำ",
                 response: "ตอบกลับแล้ว",
                 amount: Amount,
-                ref: data.transRef
+                ref: data.qrcodeData
               });
               return { amount: Amount };
             }
@@ -181,20 +178,20 @@ export async function handleRegularSlip(
               broadcastLog("🟡 พบสลิปย้อนหลังเกิน 2 วัน ❕");
               updateSlipStats(prefix, "ตรวจสลิปย้อนหลังไปแล้ว", Amount);
               await sendMessageOld(replyToken,client,formattedTransactionDateTime,
-                data.transRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
+                tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
                 fromBank, data.sender?.account.value || data.sender?.proxy.value,
                 data.receiver?.displayName || "ไม่ระบุ", toBank,
                 data.receiver?.account.value || data.receiver?.proxy.value
               );
               await reportSlipResultToAPI({
                 time: thaiTime,
-                shop: prefix,
+                shop: linename,
                 lineName,
                 image,
                 status: "สลิปย้อนหลัง",
                 response: "ตอบกลับแล้ว",
                 amount: Amount,
-                ref: data.transRef
+                ref: data.qrcodeData
               });
               return { amount: Amount };
             }
@@ -204,40 +201,91 @@ export async function handleRegularSlip(
             broadcastLog("🟢 สลิปถูกต้อง ✅");
             updateSlipStats(prefix, "ตรวจสลิปถูกต้องไปแล้ว", Amount);
             await sendMessageRight(replyToken,client,formattedTransactionDateTime,
-              data.transRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
+              tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
               fromBank, data.sender?.account.value || data.sender?.proxy.value,
               data.receiver?.displayName || "ไม่ระบุ", toBank,
               data.receiver?.account.value || data.receiver?.proxy.value
             );
             await reportSlipResultToAPI({
               time: thaiTime,
-              shop: prefix,
+              shop: linename,
               lineName,
               image,
               status: "สลิปถูกต้อง",
               response: "ตอบกลับแล้ว",
               amount: Amount,
-              ref: data.transRef
+              ref: data.qrcodeData
             });
             return { amount: Amount };
-          } else if (
-            slipOKResponse.status === "Wait" ||
-            slipOKResponse.status === "timeout"
-          ) {
-            await sendMessageWait(replyToken, client);
-            return { amount: undefined };
-          } else if (
-            slipOKResponse.status === "ignored" ||
-            slipOKResponse.status === "error"
-          ) {
+          }        
+            if (slipOKResponse.status === "Wait") {
+              const errorMessage = slipOKResponse?.data || "ไม่สามารถตรวจสอบได้";
+              const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Bangkok"
+              }) + " น.";
+              console.log("⏱️ สถานะ: รอตรวจสอบ");
+              broadcastLog("⏱️ สถานะ: รอตรวจสอบ");
+              await sendMessageWait(replyToken, client);
+              await reportSlipResultToAPI({
+                time: thaiTime,
+                shop: linename,
+                lineName,
+                image,
+                status: "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ",
+                response: "ตอบกลับ '' รอสักครู่ ''",
+                amount: undefined,
+                ref: qrData
+              });
+              return { amount: undefined };
+            }
+
+            const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+              timeZone: "Asia/Bangkok"
+            }) + " น.";
+          
+            if (slipOKResponse.status === "timeout") {
+              console.log("⏱️ สถานะ: ใช้เวลาตรวจสอบนานเกินไป");
+              broadcastLog("⏱️ สถานะ: ใช้เวลาตรวจสอบนานเกินไป");
+              await sendMessageWait(replyToken, client);
+              await reportSlipResultToAPI({
+                time: thaiTime,
+                shop: linename,
+                lineName,
+                image,
+                status: "ใช้เวลาตรวจสอบนานเกินไป",
+                response: "ตอบกลับ '' รอสักครู่ ''",
+                amount: undefined,
+                ref: qrData
+              });
+              return { amount: undefined };
+            }
+          
+            if (slipOKResponse.status === "ignored" || slipOKResponse.status === "error") {
+              await reportSlipResultToAPI({
+                time: thaiTime,
+                shop: linename,
+                lineName,
+                image,
+                status: "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ",
+                response: "ไม่ได้ตอบกลับ",
+                amount: undefined,
+                ref: qrData
+              });
+              return { amount: undefined };
+            }
+          
+          } catch (err) {
+            console.error(`❌ เกิดข้อผิดพลาดในการตรวจสอบสลิป: ${err.message}`);
+            broadcastLog(`❌ เกิดข้อผิดพลาดในการตรวจสอบสลิป: ${err.message}`);
             return { amount: undefined };
           }
-        } catch (err) {
-          console.error(`❌ เกิดข้อผิดพลาดในการตรวจสอบสลิป: ${err.message}`);
-          broadcastLog(`❌ เกิดข้อผิดพลาดในการตรวจสอบสลิป: ${err.message}`);
-          return { amount: undefined };
         }
-    }
 
 function getBankName(bankCode) {
   if (!bankCode || bankCode.trim() === "") {

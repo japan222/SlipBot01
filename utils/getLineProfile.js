@@ -15,10 +15,7 @@ export async function getLineProfile(userId, accessToken) {
       pictureUrl: profile.pictureUrl || ""
     };
   } catch (err) {
-    console.error("❌ ดึงโปรไฟล์ LINE ล้มเหลว");
-    console.error("📌 userId:", userId);
-    console.error("📌 tokenPreview:", accessToken.slice(0, 10) + "...");
-    console.error("📌 error:", err?.statusCode || err.code || err.message);
+    console.error("❌ ดึงโปรไฟล์ LINE ล้มเหลว อาจเป็นผู้ใช้ใหม่ หรือไม่ระบุชื่อ");
     return null;
   }
 }

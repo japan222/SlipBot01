@@ -1,3 +1,5 @@
+import { broadcastLog } from "../index.js";
+
 /**
  * ฟังก์ชันสำหรับส่งข้อความ Flex Message ตอบกลับกรณีสลิปซ้ำ
  * @param {string} replyToken - Token สำหรับการตอบกลับ LINE Messaging API
@@ -7,7 +9,7 @@
  * @param {string} amount - Reference Transaction ID
  * @returns {Promise<void>} - Promise ที่ส่งสถานะการส่งข้อความกลับไปยังไฟล์หลัก
  */
-export async function sendMessageSame(replyToken, client, qrInfo, qrData) {
+export async function sendMessageSame(replyToken, client, qrInfo, tranRef) {
     // สร้าง Flex Message
     const flexMessage = {
       "type": "bubble",
@@ -108,7 +110,7 @@ export async function sendMessageSame(replyToken, client, qrInfo, qrData) {
               },
               {
                 "type": "text",
-                "text": qrData,
+                "text": tranRef,
                 "color": "#aaaaaa",
                 "size": "xs",
                 "align": "end",

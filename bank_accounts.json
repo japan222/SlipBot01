@@ -1,113 +1,47 @@
 {
     "accounts": {
-        "APB": [],
-        "BIW": [],
-        "GDD": [],
-        "GHB": [],
-        "DOB": [],
-        "JDX": [
-            {
-                "THname": "กมลสิทธิ์ บ",
-                "ENGname": "KAMONSIT B",
-                "account": "5983025392",
-                "status": false
-            },
-            {
-                "THname": "ดวงดาว อ",
-                "ENGname": "DUANGDAO A",
-                "account": "2322738658",
-                "status": false
-            },
-            {
-                "THname": "ปวุฒิ โ",
-                "ENGname": "PAWUT T",
-                "account": "0224046113",
-                "status": false
-            },
-            {
-                "THname": "อมรรัตน์ เ",
-                "ENGname": "AMORRAT P",
-                "account": "6643940591",
-                "status": false
-            }
-        ],
-        "LUX": [],
-        "PGW": [],
-        "ODN": [],
-        "TGO": [],
-        "JEN": [
-            {
-                "THname": "วารินทร์ ศ",
-                "ENGname": "WARIN S",
-                "account": "0128124438",
-                "status": false
-            },
-            {
-                "THname": "แอน ค",
-                "ENGname": "ANN K",
-                "account": "3664856736",
-                "status": false
-            }
-        ],
-        "VCE": [],
-        "JPN": [
-        ],
-        "BFU": [],
-        "BFB": [],
-        "ADN": [
-            {
-                "THname": "จิระ แ",
-                "ENGname": "JIRA J",
-                "account": "6782481120",
-                "status": false
-            },
-            {
-                "THname": "สุทธิพงษ์ น",
-                "ENGname": "SUTHIPHONG N",
-                "account": "1931352586",
-                "status": false
-            },
-            {
-                "THname": "สุดารัตน์ แ",
-                "ENGname": "SUDARAT J",
-                "account": "6782481536",
-                "status": false
-            }
-        ],
-        "JYX": [
-            {
-                "THname": "เบญจวรรณ พ",
-                "ENGname": "BENJAWAN P",
-                "account": "7752448027",
-                "status": false
-            },
-            {
-                "THname": "ชนิดาภา ม",
-                "ENGname": "CHANIDAPHA M",
-                "account": "9090861825",
-                "status": false
-            }
-        ],
-        "KRM": [
-            {
-                "THname": "ปรีชา เ",
-                "ENGname": "PREECHA P",
-                "account": "1733397078",
-                "status": false
-            },
-            {
-                "THname": "กัณหา แ",
-                "ENGname": "GANHA J",
-                "account": "6782479652",
-                "status": false
-            },
-            {
-                "THname": "จำปี ร",
-                "ENGname": "CHAMPI R",
-                "account": "6782487663",
-                "status": false
-            }
-        ],
-        "RBA": []
+      "ADN": [
+        { "name": "จิระ แ", "account": "6782481120", "status": false },
+        { "name": "สุทธิพงษ์ น", "account": "1931352586", "status": false },
+        { "name": "สุดารัตน์ แ", "account": "6782481536", "status": false }
+      ],
+      "APB": [],
+      "BFU": [],
+      "BIW": [],
+      "DOB": [],
+      "GDD": [],
+      "GHB": [],
+      "GNV": [],
+      "JDX": [
+        { "name": "กมลสิทธิ์ บ", "account": "5983025392", "status": false },
+        { "name": "ดวงดาว อ", "account": "2322738658", "status": false },
+        { "name": "ปวุฒิ โ", "account": "0224046113", "status": false },
+        { "name": "อมรรัตน์ เ", "account": "6643940591", "status": false }
+      ],
+      "JEN": [
+        { "name": "วารินทร์ ศ", "account": "0128124438", "status": false },
+        { "name": "แอน ค", "account": "3664856736", "status": false }
+      ],
+      "JPN": [
+        { "name": "วารินทร์ ศ", "account": "4290642072", "status": true }
+      ],
+      "JYX": [
+        { "name": "เบญจวรรณ พ", "account": "7752448027", "status": false },
+        { "name": "ชนิดาภา ม", "account": "9090861825", "status": false }
+      ],
+      "KRM": [
+        { "name": "ปรีชา เ", "account": "1733397078", "status": false },
+        { "name": "กัณหา แ", "account": "6782479652", "status": false },
+        { "name": "จำปี ร", "account": "6782487663", "status": false }
+      ],
+      "LUX": [],
+      "MMA": [],
+      "PGW": [],
+      "SF": [],
+      "TGO": [],
+      "VCE": [],
+      "RBA": [],
+      "BFB": []
     }
-}
+  }
+  

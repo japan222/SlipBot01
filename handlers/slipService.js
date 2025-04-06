@@ -29,7 +29,7 @@ export async function sendImageToSlipOK(client, messageId) {
       ]);
   
       // กรณีสถานะ 200
-      const data = response.data; 
+      const data = response.data;
       return { success: true, status: "valid", data: data.data };
     } catch (err) {
     // --- เพิ่มโค้ดตรวจจับ ECONNRESET ให้ถือเป็น timeout ---

@@ -470,6 +470,7 @@
   border: 1px solid red;
   padding: 8px;
   border-radius: 5px;
+  margin-bottom: 20px;
   margin-left: auto;
   margin-right: auto;
   width: fit-content;
@@ -490,6 +491,7 @@
   border: 1px solid red;
   padding: 8px;
   border-radius: 5px;
+  margin-bottom: 20px;
   margin-left: auto;
   margin-right: auto;
   width: fit-content;
@@ -540,26 +542,6 @@
     padding: 12px;
     font-size: 16px;
     margin: 10px 0;
-}
-
-.main-page .alert-messageShop {
-  display: none;
-  font-size: 14px;
-  font-weight: bold;
-  color: red;
-  text-align: center;
-  background-color: #ffe6e6;
-  border: 1px solid red;
-  padding: 8px;
-  border-radius: 5px;
-  margin: 20px auto;
-  margin-top: 20px;
-  width: fit-content;
-  /* ให้ขนาดของกรอบพอดีกับข้อความ */
-  max-width: 100%;
-  /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
-  min-width: 220px;
-  /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
 }
 
 .main-page .shopInfo-modal {

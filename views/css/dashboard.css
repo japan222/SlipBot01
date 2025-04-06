@@ -51,17 +51,17 @@
 
 .table-header th:nth-child(2),
 .table-body td:nth-child(2) {
-  width: 8%; /* ร้าน */
+  width: 10%; /* ร้าน */
 }
 
 .table-header th:nth-child(3),
 .table-body td:nth-child(3) {
-  width: 8%; /* รูปภาพ */
+  width: 5%; /* รูปภาพ */
 }
 
 .table-header th:nth-child(4),
 .table-body td:nth-child(4) {
-  width: 12%; /* กำหนดความกว้างสูงสุด */
+  width: 15%; /* กำหนดความกว้างสูงสุด */
   white-space: nowrap; /* ไม่ให้ข้อความขึ้นบรรทัดใหม่ */
   overflow: hidden; /* ซ่อนข้อความที่เกิน */
   text-overflow: ellipsis; /* แสดง ... เมื่อข้อความยาวเกิน */
@@ -69,22 +69,22 @@
 
 .table-header th:nth-child(5),
 .table-body td:nth-child(5) {
-  width: 10%; /* สถานะการตรวจ */
+  width: 18%; /* สถานะการตรวจ */
 }
 
 .table-header th:nth-child(6),
 .table-body td:nth-child(6) {
-  width: 12%; /* จำนวนเงิน */
+  width: 10%; /* จำนวนเงิน */
 }
 
 .table-header th:nth-child(7),
 .table-body td:nth-child(7) {
-  width: 10%; /* การตอบกลับ */
+  width: 12%; /* การตอบกลับ */
 }
 
 .table-header th:nth-child(8),
 .table-body td:nth-child(8) {
-  width: 24%; /* กำหนดความกว้างสูงสุด */
+  width: 18%; /* กำหนดความกว้างสูงสุด */
   white-space: nowrap; /* ไม่ให้ข้อความขึ้นบรรทัดใหม่ */
   overflow: hidden; /* ซ่อนข้อความที่เกิน */
   text-overflow: ellipsis; /* แสดง ... เมื่อข้อความยาวเกิน */
