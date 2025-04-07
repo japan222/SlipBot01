@@ -34,7 +34,7 @@
         }
       ],
       "status": true,
-      "slipCheckOption": "true"
+      "slipCheckOption": "all"
     },
     {
       "name": "Kingromes",
@@ -52,7 +52,7 @@
         }
       ],
       "status": true,
-      "slipCheckOption": "true"
+      "slipCheckOption": "all"
     },
     {
       "name": "JAPAN",

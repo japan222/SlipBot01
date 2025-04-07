@@ -136,7 +136,52 @@
       <div id="shopStateBody"></div>
     </div>
   </div>
-    <script src="/views/js/main.js"></script>
+
+<!-- Modal แสดงข้อมูลธนาคาร -->  
+<div id="bankModal" class="modal bank-modal">
+    <div class="bank-modal-content">
+        <span class="modal-close" onclick="closeBankModal()">&times;</span>
+        <h2 id="BankTitle" class="BankTitle">รายการบัญชีธนาคารร้าน:</h2>
+      <div id="bank-list"></div>
+    </div>
   </div>
+
+  <!-- Modal เพิ่มบัญชี LINE -->
+  <div id="addbankModal" class="modal">
+    <div class="add-bank-modal-content">
+        <span class="modal-close" onclick="closeAddBankModal()">&times;</span>
+        <h2 id="lineShopNameTitle" class="lineShopNameTitle">เพิ่มบัญชีธนาคารสำหรับร้าน:</h2>
+        <div class="input-group">
+          <label for="bankAccountName">ชื่อบัญชี:</label>
+          <input type="text" id="bankAccountName" placeholder="กรอกชื่อบัญชี (ไม่ต้องใส่คำหน้าชื่อ)">
+        </div>
+        <div class="input-group">
+          <label for="bankAccountNumber">เลขบัญชี:</label>
+          <input type="text" id="bankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
+        </div>
+        <button class="btn btn-shop-save" onclick="saveNewBank()">บันทึก</button>
+    </div>
+    <div id="alertMessageAddline" class="alert-message-Line"></div>
+</div>
+
+<div id="editbankModal" class="modal">
+    <div class="edit-bank-modal-content">
+        <span class="modal-close" onclick="closeEditBankModal()">&times;</span>
+        <h2 id="EditBankTitle" class="EditBankTitle">แก้ไขธนาคาร</h2>
+        <div class="input-group">
+          <label for="editBankAccountName">ชื่อบัญชี:</label>
+          <input type="text" id="editBankAccountName" placeholder="กรอกชื่อบัญชี">
+        </div>
+        <div class="input-group">
+          <label for="editBankAccountNumber">เลขบัญชี:</label>
+          <input type="text" id="editBankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
+        </div>
+        <button class="btn btn-shop-save" onclick="saveEditedBank()">บันทึก</button>
+    </div>
+    <div id="alertMessageEditBank" class="alert-message-Line"></div>
+</div>
+</div>
+  </div> <!-- ปิด .main-page -->
+<script src="/views/js/main.js"></script>
 </body>
 </html>

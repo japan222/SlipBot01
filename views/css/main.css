@@ -36,6 +36,15 @@
   gap: 10px;
 }
 
+/* bank-list ที่เลื่อนได้ */
+.main-page .bank-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .main-page .shop-item {
   display: flex;
   justify-content: space-between;
@@ -81,6 +90,14 @@
 
 /* Toggle Switch CSS */
 .main-page .switch {
+  margin-right: 10px;
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  height: 24px;
+}
+
+.main-page .switchBank {
   margin-right: 10px;
   display: inline-block;
   position: relative;
@@ -155,11 +172,51 @@
 }
 
 .main-page .btn-info {
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+
+.main-page .btn-bank {
   background-color: #28aa00;
   color: #fff;
   border: 1px solid #28aa00;
   font-size: 16px;
   border-radius: 10px;
+}
+
+.main-page .btn-add-bank {
+  z-index: 1;
+  position: relative;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.main-page .btn-add-bank:hover {
+  background-color: #0056b3;
+}
+
+.main-page .bank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* ✅ จัดให้ทุกอย่างอยู่กลางแนวดิ่ง */
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.bank-status.active {
+  color: green;
+  font-weight: bold;
+}
+.bank-status.inactive {
+  color: red;
+  font-weight: bold;
 }
 
 .main-page .btn-edit {
@@ -184,9 +241,14 @@
   /* สีพื้นหลังเมื่อ hover */;
 }
 
-.main-page .btn-info:hover {
+.main-page .btn-bank:hover {
   background-color: #007a14;
   border-color: #007a14;
+}
+
+.main-page .btn-info:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .main-page .btn-edit:hover {
@@ -306,6 +368,17 @@
 }
 
 .main-page .showLine-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  /* ขยายให้กว้างขึ้น */
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.main-page .bank-modal-content {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
@@ -528,23 +601,53 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* เพิ่มเงา */
 }
 
+
 /* ปรับขนาดฟอร์มภายใน modal */
 .main-page .addShop-modal-content .input-group,
 .main-page .editShop-modal-content .input-group {
-    width: 80%;
-    margin: 20px auto;
+  width: 80%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* ทำให้เนื้อหาภายในช่องกรอกข้อมูลอยู่กลาง */
 }
 
 /* ปรับขนาด input */
 .main-page .addShop-modal-content input,
-.main-page .editShop-modal-content input {
-    width: 100%;
+.main-page .editShop-modal-content input,
+.main-page .edit-bank-modal-content input,
+.main-page .add-bank-modal-content input {
+    width: 100%; 
     padding: 12px;
     font-size: 16px;
     margin: 10px 0;
+    box-sizing: border-box; /* ทำให้ปุ่มไม่เกินขอบ */
 }
 
+.main-page .edit-bank-modal .input-group,
+.main-page .add-bank-modal .input-group {
+  width: 70%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
 .main-page .shopInfo-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.main-page .bank-modal {
   display: none;
   position: fixed;
   z-index: 1000;
@@ -562,6 +665,53 @@
   font-size: 28px;
   margin-bottom: 30px;
   text-align: center;
+}
+
+.main-page .BankTitle {
+  font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.main-page .EditBankTitle {
+  font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+
+.main-page .lineShopNameTitle {
+  font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.main-page .bank-modal-content {
+  background-color: white;
+  padding: 30px;  /* เพิ่ม padding */
+  border-radius: 12px; /* เพิ่มความโค้งมน */
+  width: 800px;   /* เพิ่มความกว้าง */
+  max-width: 90%; /* รองรับการแสดงผลบนจอเล็ก */
+  min-height: 200px; /* กำหนดความสูงขั้นต่ำ */
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* เพิ่มเงา */
+}
+
+.main-page .edit-bank-modal-content,
+.main-page .add-bank-modal-content {
+  background-color: white;
+  padding: 30px;  /* เพิ่ม padding */
+  border-radius: 12px; /* เพิ่มความโค้งมน */
+  width: 600px;   /* เพิ่มความกว้าง */
+  max-width: 90%; /* รองรับการแสดงผลบนจอเล็ก */
+  min-height: 200px; /* กำหนดความสูงขั้นต่ำ */
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* เพิ่มเงา */
 }
 
 .main-page .shopInfo-modal-content {

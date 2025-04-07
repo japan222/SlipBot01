@@ -89,15 +89,15 @@
         }
 
         if (page === "dashboard" && typeof initDashboard === "function") {
-          initDashboard(); // 🟢 โหลด slip + scroll
-          setupSSE();      // 🟢 เชื่อมต่อ SSE
+          initDashboard();
+          setupSSE();
         }
       }
 
       if (page === "logs") {
         const logsContainer = document.getElementById("logs");
         const eventSource = new EventSource("/api/logs");
-        const MAX_LOGS = 50; // กำหนดจำนวนรายการสูงสุดที่จะแสดง
+        const MAX_LOGS = 200; // กำหนดจำนวนรายการสูงสุดที่จะแสดง
 
         eventSource.onmessage = (event) => {
           if (event.data) {

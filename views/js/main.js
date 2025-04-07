@@ -55,6 +55,10 @@ function openShopLinesModal(prefix) {
     modal.style.display = "flex";
 }
 
+function closeEditBankModal() {
+    document.getElementById("editbankModal").style.display = "none";
+}
+
 // ปิด Modal
 function closeShopLinesModal() {
     document.getElementById("shopLinesModal").style.display = "none";
@@ -370,9 +374,9 @@ window.addEventListener("DOMContentLoaded", loadShops);
 function openShopInfoModal(shop) {
     document.getElementById("shopInfoTitle").textContent = `ข้อมูลร้าน: ${shop.name || "ไม่ระบุชื่อ"}`;
     document.getElementById("shopInfoModal").style.display = "flex";
-  
+
     const linesHTML = (shop.lines && shop.lines.length > 0)
-      ? `
+        ? `
         <p class="top-list"><strong>ไลน์สำหรับร้านนี้</strong></p>
         <ul class="line-list-ul">
           ${shop.lines.map((line, index) => `
@@ -384,17 +388,17 @@ function openShopInfoModal(shop) {
             </li>
           `).join("")}
         </ul>`
-      : `<p class="no-line">❌ ไม่มีบัญชี LINE ที่เพิ่มไว้</p>`;
-  
+        : `<p class="no-line">❌ ไม่มีบัญชี LINE ที่เพิ่มไว้</p>`;
+
     document.getElementById("shopInfoBody").innerHTML = `
       <p><strong>Prefix:</strong> ${shop.prefix}</p>
       ${linesHTML}
     `;
-  }
-  
-  function closeShopInfoModal() {
+}
+
+function closeShopInfoModal() {
     document.getElementById("shopInfoModal").style.display = "none";
-  }
+}
 
 // ฟังก์ชันเปิด Modal แก้ไขร้านค้า
 function openEditShopModal(name, prefix) {
@@ -408,6 +412,17 @@ function openEditShopModal(name, prefix) {
 function closeEditShopModal() {
     document.getElementById("editShopModal").style.display = "none";
 }
+
+// เปิด Modal
+function openAddShopModal() {
+    document.getElementById("addShopModal").style.display = "flex";
+}
+
+// ปิด Modal
+function closeAddShopModal() {
+    document.getElementById("addShopModal").style.display = "none";
+}
+
 
 // ฟังก์ชันบันทึกการแก้ไขร้านค้า
 async function saveShopChanges() {
@@ -453,21 +468,21 @@ function showAlertMessage(message, elementId = "alertMessageEditShop", isSuccess
 // ✅ ฟังก์ชันหลัก โหลดร้านค้า + render
 async function loadShopsAndRender() {
     try {
-      const response = await fetch("/api/shops");
-      const data = await response.json();
-      shopData = data.shops || [];
-  
-      const shopListElement = document.getElementById("shop-list");
-      if (!shopData.length) {
-        shopListElement.innerHTML = '<div class="no-shop">ยังไม่มีข้อมูลร้านค้า</div>';
-        return;
-      }
-  
-      let html = "";
-      shopData.forEach(shop => {
-        const slipCheckOption = shop.slipCheckOption || "duplicate";
-  
-        html += `
+        const response = await fetch("/api/shops");
+        const data = await response.json();
+        shopData = data.shops || [];
+
+        const shopListElement = document.getElementById("shop-list");
+        if (!shopData.length) {
+            shopListElement.innerHTML = '<div class="no-shop">ยังไม่มีข้อมูลร้านค้า</div>';
+            return;
+        }
+
+        let html = "";
+        shopData.forEach(shop => {
+            const slipCheckOption = shop.slipCheckOption || "duplicate";
+
+            html += `
           <div class="main-page shop-item">
             <div class="shop-info ${shop.status ? "active" : "inactive"}">
               <span class="status-dot"></span>
@@ -488,24 +503,25 @@ async function loadShopsAndRender() {
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/LINE_logo.svg/120px-LINE_logo.svg.png" class="btn-logo" alt="LINE Logo"/>
                     ไลน์ร้าน
               </button>
+              <button class="btn btn-bank" onclick="openBankModal('${shop.prefix}')">จัดการบัญชีธนาคาร</button>
               <button class="btn btn-info btn-shop-info" data-prefix="${shop.prefix}">ข้อมูลร้านค้า</button>
               <button class="btn btn-edit" onclick="openEditShopModal('${shop.name}', '${shop.prefix}')">แก้ไข</button>
               <button class="btn btn-delete" onclick="deleteShop('${shop.prefix}')">ลบร้านค้า</button>
             </div>
           </div>
         `;
-      });
-  
-      shopListElement.innerHTML = html;
-      document.querySelectorAll(".btn-shop-info").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const prefix = btn.getAttribute("data-prefix");
-          const shop = shopData.find(s => s.prefix === prefix);
-          if (shop) openShopInfoModal(shop);
         });
-      });
+
+        shopListElement.innerHTML = html;
+        document.querySelectorAll(".btn-shop-info").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const prefix = btn.getAttribute("data-prefix");
+                const shop = shopData.find(s => s.prefix === prefix);
+                if (shop) openShopInfoModal(shop);
+            });
+        });
     } catch (err) {
-      console.error("❌ โหลดข้อมูลร้านค้าไม่สำเร็จ:", err);
+        console.error("❌ โหลดข้อมูลร้านค้าไม่สำเร็จ:", err);
     }
 }
 
@@ -523,31 +539,225 @@ async function fetchAndRenderQuota() {
         const data = await res.json();
         const el = document.querySelector(".quota");
         if (!el) {
-          console.warn("⚠️ ไม่พบ .quota element ใน DOM");
-          return;
+            console.warn("⚠️ ไม่พบ .quota element ใน DOM");
+            return;
         }
 
         if (data.quota === 0) {
             el.textContent = `โควต้าที่เหลือ: -${Math.round(data.overQuota || 0)}`;
             el.style.color = "#dc3545";
-          } else {
+        } else {
             el.textContent = `โควต้าที่เหลือ: ${data.quota}`;
             el.style.color = "#111111";
-          }
+        }
     } catch {
         document.querySelector(".quota").textContent = "โค้วต้าที่เหลือ: ไม่ทราบ";
     }
 }
 
-// เปิด Modal
-function openAddShopModal() {
-    document.getElementById("addShopModal").style.display = "flex";
+function openBankModal(prefix) {
+    let modal = document.getElementById("bankModal");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "bankModal";
+        modal.className = "modal";
+        document.body.appendChild(modal);
+    }
+
+    modal.style.display = "flex";  // เปิด Modal
+
+    fetch("/api/bank-accounts")
+        .then((res) => res.json())
+        .then((data) => {
+            const accounts = data.accounts[prefix] || [];
+            const listContainer = document.getElementById("bank-list");
+            const bankTitle = document.getElementById("BankTitle");
+
+            listContainer.innerHTML = "";
+            const shop = shopData.find(s => s.prefix === prefix);
+            if (shop) {
+                shop.bankAccounts = accounts; // ✅ บรรทัดนี้คือหัวใจของปัญหา
+                bankTitle.textContent = `รายการบัญชีธนาคารร้าน: ${shop.name}`;
+            }
+
+            if (accounts.length === 0) {
+                listContainer.innerHTML = "<p>ยังไม่มีบัญชีธนาคารสำหรับร้านนี้</p>";
+            } else {
+                accounts.forEach((account, index) => {
+                    const row = document.createElement("div");
+                    row.className = "bank-row";
+                    row.innerHTML = `
+              <div class="shop-info ${account.status ? "active" : "inactive"}">
+                <span class="status-dot"></span>
+                <span class="shop-name">${account.name}</span>
+              </div>
+              <div class="slip-check-option">
+                <label class="switchBank">
+                  <input type="checkbox" ${account.status ? "checked" : ""} onchange="toggleBankStatus('${prefix}', ${index}, this)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="buttons">
+                <button class="line-btn-edit" onclick="openEditBankModal('${prefix}', ${index})">แก้ไข</button>
+                <button class="line-btn-delete" onclick="deleteBank('${prefix}', ${index})">ลบ</button>
+              </div>
+            `;
+                    listContainer.appendChild(row);
+                });
+            }
+
+            // ✅ เพิ่มปุ่มด้านล่างรายการ
+            const addBtn = document.createElement("button");
+            addBtn.className = "btn btn-add-bank";
+            addBtn.textContent = "+ เพิ่มธนาคารใหม่";
+            addBtn.style.marginTop = "30px";
+            addBtn.style.fontSize = "16px";
+            addBtn.style.padding = "10px 20px";
+            addBtn.style.borderRadius = "8px";
+            addBtn.addEventListener("click", () => openAddBankModal(prefix));
+            listContainer.appendChild(addBtn);
+            
+            modal.style.display = "flex";
+        })
+        .catch((err) => {
+            console.error("เกิดข้อผิดพลาดในการโหลดบัญชีธนาคาร:", err);
+        });
 }
 
-// ปิด Modal
-function closeAddShopModal() {
-    document.getElementById("addShopModal").style.display = "none";
+function openAddBankModal(prefix) {
+    let modal = document.getElementById("addbankModal");
+
+    // เปิด Modal
+    modal.style.display = "flex";
+    console.log("เปิด Modal แล้ว");
+
+    // ค้นหาร้านค้าตาม prefix
+    const shop = shopData.find(s => s.prefix === prefix);
+    console.log("shop: ", shop);
+
+    if (!shop) {
+        console.error("ไม่พบข้อมูลร้าน");
+        return;
+    }
+
+    // อัปเดตชื่อร้านใน Modal
+    const shopName = shop.name;
+    console.log("ชื่อร้าน: ", shopName); // ตรวจสอบชื่อร้าน
+
+    document.getElementById("lineShopNameTitle").textContent = `เพิ่มบัญชีธนาคารสำหรับร้าน: ${shopName}`;
+
+    // รีเซ็ตค่ากรอกข้อมูลใน input fields
+    document.getElementById("bankAccountName").value = "";
+    document.getElementById("bankAccountNumber").value = "";
 }
+
+
+// ปิด Modal
+function closeAddBankModal() {
+    document.getElementById("addbankModal").style.display = "none";
+}
+
+function closeBankModal() {
+    const modal = document.getElementById("bankModal");
+    if (modal) {
+        modal.style.display = "none";  // ซ่อน Modal
+    }
+}
+
+async function toggleBankStatus(prefix, index, checkbox) {
+    const newStatus = checkbox.checked;
+    try {
+        const res = await fetch("/api/update-bank-status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ prefix, index, status: newStatus }),
+        });
+
+        const result = await res.json();
+        if (!result.success) {
+            alert("ไม่สามารถอัปเดตสถานะบัญชีได้: " + result.message);
+            checkbox.checked = !newStatus;
+        }
+    } catch (err) {
+        console.error("เกิดข้อผิดพลาดในการอัปเดตสถานะบัญชีธนาคาร", err);
+        alert("เกิดข้อผิดพลาดในการอัปเดตสถานะบัญชีธนาคาร");
+        checkbox.checked = !newStatus;
+    }
+}
+
+function openEditBankModal(prefix, index) {
+    const modal = document.getElementById("editbankModal");
+    const shop = shopData.find(s => s.prefix === prefix);
+    if (!shop || !shop.bankAccounts || !shop.bankAccounts[index]) {
+        console.error("ไม่พบข้อมูลร้านหรือบัญชีธนาคาร");
+        return;
+    }
+
+    const account = shop.bankAccounts[index];
+    document.getElementById("editBankAccountName").value = account.name;
+    document.getElementById("editBankAccountNumber").value = account.account;
+
+    modal.style.display = "flex";
+}
+function closeEditBankModal() {
+    document.getElementById("editbankModal").style.display = "none";
+}
+
+function deleteBank(prefix, index) {
+    if (!confirm("คุณแน่ใจหรือไม่ที่จะลบบัญชีนี้?")) return;
+    fetch("/api/delete-bank", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prefix, index }),
+    })
+        .then((res) => res.json())
+        .then((result) => {
+            if (result.success) {
+                alert("ลบบัญชีธนาคารเรียบร้อย");
+                openBankModal(prefix);
+            } else {
+                alert("ไม่สามารถลบบัญชีธนาคารได้: " + result.message);
+            }
+        })
+        .catch((err) => {
+            console.error("เกิดข้อผิดพลาดในการลบบัญชีธนาคาร", err);
+        });
+}
+
+function saveNewBank(prefix) {
+    const name = document.getElementById("bankAccountName").value.trim();
+    const number = document.getElementById("bankAccountNumber").value.trim();
+
+    if (!name || !number) {
+        alert("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ");
+        return;
+    }
+
+    fetch("/api/add-bank", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prefix, name, number })
+    })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                alert("✅ เพิ่มบัญชีธนาคารสำเร็จ!");
+                document.querySelector(".modal.bank-modal").remove();
+                openBankModal(prefix);
+            } else {
+                alert("❌ ไม่สามารถเพิ่มบัญชีธนาคารได้: " + result.message);
+            }
+        })
+        .catch(err => {
+            console.error("เกิดข้อผิดพลาดในการเพิ่มบัญชีธนาคาร", err);
+        });
+}
+
 
 function showAlertMessage(message, elementId = "alertMessageShop", isSuccess = false) {
     const alertDiv = document.getElementById(elementId);
@@ -685,7 +895,7 @@ async function updateSlipCheckOption(prefix, newOption) {
     }
 }
 
-    window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("DOMContentLoaded", async () => {
     try {
         const response = await fetch("/api/shops");
         const data = await response.json();
@@ -695,8 +905,9 @@ async function updateSlipCheckOption(prefix, newOption) {
             shopListElement.innerHTML = '<div class="no-shop">ยังไม่มีข้อมูลร้านค้า</div>';
             return;
         }
-    
+
     } catch (error) {
         console.error("ไม่สามารถโหลดข้อมูลร้านค้า:", error);
     }
 });
+

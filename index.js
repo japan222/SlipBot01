@@ -77,6 +77,17 @@ export function broadcastLog(message) {
   });
 }
 
+app.get("/api/bank-accounts", (req, res) => {
+  try {
+    const data = fs.readFileSync("./bank_accounts.json", "utf-8");
+    const accounts = JSON.parse(data);
+    res.json(accounts);
+  } catch (err) {
+    console.error("❌ โหลด bank_accounts.json ไม่สำเร็จ:", err.message);
+    res.status(500).json({ error: "โหลดบัญชีไม่สำเร็จ" });
+  }
+});
+
 app.get("/events", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
