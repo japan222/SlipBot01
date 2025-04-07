@@ -33,8 +33,8 @@
           "secret_token": "e67e87e66440ae0a2d35eba712e98047"
         }
       ],
-      "status": false,
-      "slipCheckOption": "duplicate"
+      "status": true,
+      "slipCheckOption": "true"
     },
     {
       "name": "Kingromes",
@@ -51,8 +51,8 @@
           "secret_token": "d4180ddb430ed671cbb10616bc9ceb97"
         }
       ],
-      "status": false,
-      "slipCheckOption": "duplicate"
+      "status": true,
+      "slipCheckOption": "true"
     },
     {
       "name": "JAPAN",
@@ -69,7 +69,7 @@
           "secret_token": "b71fbb5c154f99780d0948ce4d395447"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {
@@ -93,20 +93,33 @@
           "secret_token": "U764f7e51acde64abc426b22cdd5932bd"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {
       "name": "PGwin",
       "prefix": "PGW",
-      "lines": [],
-      "status": false
+      "lines": [
+        {
+          "linename": "PGwwinn",
+          "access_token": "Sm7iIrygemlqYq0c1s9smEFHJPJ7leoWzcSl0HYIEoxIT8qeHNMV7h/mTI2642OjGw/Iw3UW7Zr0NiOxhAo+HR9bIW4wlcLHYMeaMSBj0R4bwWGpFJxU+0q1oLsWBgRE6CnrwuybV9AJlFDEOu/9XwdB04t89/1O/w1cDnyilFU=",
+          "secret_token": "394ff0ed276e6f5bc3c1a83d74ac1c7d"
+        },
+        {
+          "linename": "PGwin(สำรอง)",
+          "access_token": "xVIAD8iWLM5u1Bde2X2aExc6pmjEpd7v2Glc3Mr1qHVdl0EkFY4YOT53efOshUb/FoCspmyFvtutEVXVtp2/b34BciAly/US0RdqVys7uMMZG/vcEINEmC+elN/KN0AGADAOuT0gyxvVp3dxm1+bngdB04t89/1O/w1cDnyilFU=",
+          "secret_token": "5b2702fa5cb53d3c3f92dac5355fc3e4"
+        }
+      ],
+      "status": true,
+      "slipCheckOption": "all"
     },
     {
       "name": "Apollo",
       "prefix": "APB",
       "lines": [],
-      "status": false
+      "status": false,
+      "slipCheckOption": "all"
     },
     {
       "name": "Truegame",
@@ -141,7 +154,8 @@
           "secret_token": "6d5168cbd04e6df38944b97388b6bf1c"
         }
       ],
-      "status": false
+      "status": true,
+      "slipCheckOption": "all"
     },
     {
       "name": "Jonny",
@@ -158,7 +172,8 @@
           "secret_token": "0bcb60fa11e363f80fe5fd5f4078bc1d"
         }
       ],
-      "status": false
+      "status": true,
+      "slipCheckOption": "all"
     },
     {
       "name": "Sexyfish",
@@ -175,7 +190,8 @@
           "secret_token": "7e73270987e069565ca4820914c2f891"
         }
       ],
-      "status": false
+      "status": true,
+      "slipCheckOption": "duplicate"
     },
     {
       "name": "GENEVA",
@@ -192,7 +208,7 @@
           "secret_token": "60e2630a518694d68e36a9ebe4911a11"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {
@@ -210,7 +226,7 @@
           "secret_token": "8ed2145c81b4888ff5f868021d23c8bf"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     }
   ]

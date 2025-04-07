@@ -44,6 +44,13 @@ export async function handleRegularSlip(
     const now = Date.now();
     const slipOKResponse = await sendImageToSlipOK(client, messageId);
 
+    const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Bangkok"
+    }) + " น.";
+
     if (slipOKResponse.status === "valid") {
       const data = slipOKResponse.data;
       if (!data) return { amount: undefined };
@@ -101,10 +108,7 @@ export async function handleRegularSlip(
                     data.receiver?.account.value || data.receiver?.proxy.value
                   );
                   await reportSlipResultToAPI({
-                    time: new Date().toLocaleTimeString("th-TH", {
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    }) + " น.",
+                    time: thaiTime,
                     shop: linename,
                     lineName,
                     image,
@@ -123,13 +127,6 @@ export async function handleRegularSlip(
             const transactionDate = new Date(
               `${data.transDate.slice(0, 4)}-${data.transDate.slice(4, 6)}-${data.transDate.slice(6, 8)}T${data.transTime}+07:00`
             );
-
-            const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-              timeZone: "Asia/Bangkok"
-            }) + " น.";
 
             const daysDifference = (now - transactionDate.getTime()) / (1000 * 60 * 60 * 24);
 
@@ -241,13 +238,6 @@ export async function handleRegularSlip(
               });
               return { amount: undefined };
             }
-
-            const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-              timeZone: "Asia/Bangkok"
-            }) + " น.";
           
             if (slipOKResponse.status === "timeout") {
               console.log("⏱️ สถานะ: ใช้เวลาตรวจสอบนานเกินไป");
