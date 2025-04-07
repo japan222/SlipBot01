@@ -174,7 +174,7 @@ export async function handleEvent(event, client, prefix, linename, qrDatabase) {
                       lineName,
                       image,
                       status: "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง",
-                      response: "ตอบกลับ 'รอสักครู่'",
+                      response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
                       amount: qrInfo.amount,
                       ref: qrData
                     });

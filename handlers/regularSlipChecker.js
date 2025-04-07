@@ -216,7 +216,6 @@ export async function handleRegularSlip(
             return { amount: Amount };
           }        
             if (slipOKResponse.status === "Wait") {
-              const errorMessage = slipOKResponse?.data || "ไม่สามารถตรวจสอบได้";
               const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -232,7 +231,7 @@ export async function handleRegularSlip(
                 lineName,
                 image,
                 status: "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ",
-                response: "ตอบกลับ '' รอสักครู่ ''",
+                response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
                 amount: undefined,
                 ref: qrData
               });
@@ -248,8 +247,8 @@ export async function handleRegularSlip(
                 shop: linename,
                 lineName,
                 image,
-                status: "ใช้เวลาตรวจสอบนานเกินไป",
-                response: "ตอบกลับ '' รอสักครู่ ''",
+                status: "ใช้เวลาตรวจสอบนานเกินไป รอแอดมินตรวจสอบ",
+                response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
                 amount: undefined,
                 ref: qrData
               });
