@@ -7,7 +7,7 @@ const credentials = {
     // ตัวอย่างบัญชีแอดมินเพิ่มเติม (ถ้ามี)
     { username: "admin1", password: "aa112233" },
     { username: "admin2", password: "aa112233" },
-    { username: "admin2", password: "aa112233" }
+    { username: "admin3", password: "aa112233" }
   ]
 };
 

@@ -9,7 +9,7 @@ import { saveQRDatabaseToFile } from "../qrdata/qrData.js";
 import bankCodeMapping from "../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../utils/slipStatsManager.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
-import { broadcastLog } from "../index.js";
+import { broadcastLog, getBankAccounts } from "../index.js";
 import { isAccountNumberMatch } from "../utils/accountUtils.js";
 
 /**
@@ -34,7 +34,6 @@ export async function handleRegularSlip(
   userId,
   userMessageCount, // ✅ เพิ่มเข้ามา
   userInfo,
-  bankAccounts, // ✅ รับเข้ามา
   lineName,
   image,
   linename,
@@ -43,6 +42,8 @@ export async function handleRegularSlip(
   try {
     const now = Date.now();
     const slipOKResponse = await sendImageToSlipOK(client, messageId);
+    const bankAccounts = getBankAccounts();
+    const accountData = bankAccounts[prefix] || [];
 
     const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
       hour: "2-digit",
@@ -74,26 +75,30 @@ export async function handleRegularSlip(
       qrDatabase.set(qrData, qrEntry);
       saveQRDatabaseToFile(prefix, qrDatabase);
 
-            const accountData = bankAccounts[prefix] || [];
-
-            if (accountData.length === 0) {
-            } else {
-              const activeAccounts = accountData.filter(account => account.status === true);
-            
+        if (accountData.length === 0) {
+          console.log("ไม่มีบัญชีในร้านนี้");
+          broadcastLog("ไม่มีบัญชีในร้านนี้");
+        } else {
+          const activeAccounts = accountData.filter(account => account.status === true);
+      
               if (activeAccounts.length === 0) {
-                console.log("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่ใช้ตรวจสอบ.... ");
+                console.log("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่เปิดใช้ในการตรวจสอบ.... ");
+                broadcastLog("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่เปิดใช้ในการตรวจสอบ.... ");
               } else {
                 const receiverAccount = data.receiver?.account?.value || data.receiver?.proxy?.value || "ไม่ระบุ";
                 let accountMatched = false;
             
                 for (const account of activeAccounts) {
                   console.log(`✅ กำลังตรวจสอบบัญชี: ${receiverAccount} กับ ${account.account}`);
+                  broadcastLog(`✅ กำลังตรวจสอบบัญชี: ${receiverAccount} กับ ${account.account}`);
                   if (isAccountNumberMatch(receiverAccount, account.account)) {
                     console.log(`🎯 หมายเลขบัญชีตรงกับ: ${receiverAccount}`);
+                    broadcastLog(`🎯 หมายเลขบัญชีตรงกับ: ${receiverAccount}`);
                     accountMatched = true;
-                    break; // ✅ หยุดทันทีเมื่อเจอเลขบัญชีที่ตรงกัน
+                    break;
                   } else {
                     console.log(`❌ หมายเลขบัญชีไม่ตรงกับ: ${receiverAccount}`);
+                    broadcastLog(`❌ หมายเลขบัญชีไม่ตรงกับ: ${receiverAccount}`);
                   }
                 }
 
@@ -216,6 +221,7 @@ export async function handleRegularSlip(
             return { amount: Amount };
           }        
             if (slipOKResponse.status === "Wait") {
+              const errorMessage = slipOKResponse?.data || "ไม่สามารถตรวจสอบได้";
               const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -231,7 +237,7 @@ export async function handleRegularSlip(
                 lineName,
                 image,
                 status: "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ",
-                response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
+                response: "ตอบกลับ '' รอสักครู่ ''",
                 amount: undefined,
                 ref: qrData
               });
@@ -247,8 +253,8 @@ export async function handleRegularSlip(
                 shop: linename,
                 lineName,
                 image,
-                status: "ใช้เวลาตรวจสอบนานเกินไป รอแอดมินตรวจสอบ",
-                response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
+                status: "ใช้เวลาตรวจสอบนานเกินไป",
+                response: "ตอบกลับ '' รอสักครู่ ''",
                 amount: undefined,
                 ref: qrData
               });

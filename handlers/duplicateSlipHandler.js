@@ -37,13 +37,6 @@ const loadShopData = () => {
 // โหลดข้อมูลร้านค้าในครั้งแรก
 loadShopData();
 
-let bankAccounts = loadBankAccounts();
-if (bankAccounts && Object.keys(bankAccounts).length > 0) {
-} else {
-  console.warn("⚠️ ไม่มีบัญชีธนาคารที่ใช้งานได้");
-  broadcastLog("⚠️ ไม่มีบัญชีธนาคารที่ใช้งานได้");
-}
-
 let currentSettings = loadSettings();
 
 export function getSettings() {
@@ -174,7 +167,7 @@ export async function handleEvent(event, client, prefix, linename, qrDatabase) {
                       lineName,
                       image,
                       status: "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง",
-                      response: "ตอบกลับ '' รอสักครู่ '' แล้ว",
+                      response: "ตอบกลับ 'รอสักครู่'",
                       amount: qrInfo.amount,
                       ref: qrData
                     });
@@ -253,7 +246,6 @@ export async function handleEvent(event, client, prefix, linename, qrDatabase) {
               userId,
               userMessageCount,
               userInfo,
-              bankAccounts,
               lineName,
               image,
               linename,
@@ -300,19 +292,4 @@ function getCurrentTimeOnly() {
     timeZone: "Asia/Bangkok"
   }) + " น.";
 }
-
-function loadBankAccounts() {
-  try {
-    const rawData = fs.readFileSync("./bank_accounts.json", "utf-8");
-    const jsonData = JSON.parse(rawData);
-    return jsonData.accounts || {}; // ✅ คืนค่ารายการบัญชี
-  } catch (error) {
-    console.error("❌ ไม่สามารถโหลด bank_accounts.json:", error.message);
-    broadcastLog(`❌ ไม่สามารถโหลด bank_accounts.json:", ${error.message}`);
-    return {};
-  }
-}
-
-
-
 

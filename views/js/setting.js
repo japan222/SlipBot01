@@ -1,7 +1,7 @@
 (function() {
     const DEFAULT_SETTINGS = {
       timeLimit: 120,
-      sameQrTimeLimit: 1200,
+      sameQrTimeLimit: 3600,
       maxMessagesPerUser: 3,
       maxMessagesSamePerUser: 2,
       maxProcessingPerUser: 2

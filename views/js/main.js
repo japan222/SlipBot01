@@ -704,6 +704,39 @@ function closeEditBankModal() {
     document.getElementById("editbankModal").style.display = "none";
 }
 
+function showAlertMessage(message, elementId = "alertMessageAddBank", isSuccess = false) {
+    const alertDiv = document.getElementById(elementId);
+    if (!alertDiv) {
+        return;
+    }
+    alertDiv.innerText = message;
+    alertDiv.style.color = isSuccess ? "green" : "red";
+    alertDiv.style.backgroundColor = isSuccess ? "#e6ffe6" : "#ffe6e6";
+    alertDiv.style.border = isSuccess ? "1px solid green" : "1px solid red";
+    alertDiv.style.display = "block";
+
+    setTimeout(() => {
+        alertDiv.style.display = "none";
+    }, 3000);
+}
+
+function showAlertMessage(message, elementId = "alertMessageEditBank", isSuccess = false) {
+    const alertDiv = document.getElementById(elementId);
+    if (!alertDiv) {
+        return;
+    }
+    alertDiv.innerText = message;
+    alertDiv.style.color = isSuccess ? "green" : "red";
+    alertDiv.style.backgroundColor = isSuccess ? "#e6ffe6" : "#ffe6e6";
+    alertDiv.style.border = isSuccess ? "1px solid green" : "1px solid red";
+    alertDiv.style.display = "block";
+
+    setTimeout(() => {
+        alertDiv.style.display = "none";
+    }, 3000);
+}
+
+
 function saveNewBank() {
     const modal = document.getElementById("addbankModal");
     const prefix = modal.dataset.prefix; // ✅ ดึง prefix จาก modal
@@ -711,7 +744,7 @@ function saveNewBank() {
     const number = document.getElementById("bankAccountNumber").value.trim();
 
     if (!name || !number) {
-        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageShop", false);
+        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageAddBank", false);
         return;
     }
 
@@ -727,7 +760,7 @@ function saveNewBank() {
             openBankModal(prefix); // โหลดใหม่
             restartWebhooks();
         } else {
-            showAlertMessage("❌ ไม่สามารถเพิ่มบัญชีธนาคารได้: " + result.message, "alertMessageShop", false);
+            showAlertMessage("❌ ไม่สามารถเพิ่มบัญชีธนาคารได้: " + result.message, "alertMessageAddBank", false);
         }
     })
     .catch(err => {
@@ -744,7 +777,7 @@ function saveEditedBank() {
     const number = document.getElementById("editBankAccountNumber").value.trim();
 
     if (!name || !number) {
-        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageShop", false);
+        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageEditBank", false);
         return;
     }
 
@@ -759,12 +792,12 @@ function saveEditedBank() {
             closeEditBankModal();
             openBankModal(prefix);
         } else {
-            showAlertMessage("❌ ไม่สามารถแก้ไขบัญชีธนาคารได้: " + result.message, "alertMessageShop", false);
+            showAlertMessage("❌ ไม่สามารถแก้ไขบัญชีธนาคารได้: " + result.message, "alertMessageEditBank", false);
         }
     })
     .catch(err => {
         console.error("เกิดข้อผิดพลาดในการแก้ไขบัญชีธนาคาร:", err);
-        showAlertMessage("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "alertMessageShop", false);
+        showAlertMessage("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "alertMessageEditBank", false);
     });
 }
 

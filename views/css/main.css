@@ -576,6 +576,28 @@
   /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
 }
 
+.main-page .alert-message-Bank {
+  display: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  background-color: #ffe6e6;
+  border: 1px solid red;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  /* ให้ขนาดของกรอบพอดีกับข้อความ */
+  max-width: 90%;
+  /* จำกัดขนาดไม่ให้ใหญ่เกินไป */
+  min-width: 400px;
+  /* ให้มีขนาดพอเหมาะ ไม่เล็กเกินไป */;
+}
+
+
 /* สไตล์ Modal */
 .main-page .addShop-modal, .editShop-modal {
   display: none;

@@ -146,7 +146,7 @@
     </div>
   </div>
 
-  <!-- Modal เพิ่มบัญชี LINE -->
+  <!-- Modal เพิ่มบัญชีธนาคาร -->
   <div id="addbankModal" class="modal">
     <div class="add-bank-modal-content">
         <span class="modal-close" onclick="closeAddBankModal()">&times;</span>
@@ -159,9 +159,9 @@
           <label for="bankAccountNumber">เลขบัญชี:</label>
           <input type="text" id="bankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
         </div>
+        <div id="alertMessageAddBank" class="alert-message-Bank"></div>
         <button class="btn btn-shop-save" onclick="saveNewBank()">บันทึก</button>
     </div>
-    <div id="alertMessageAddline" class="alert-message-Line"></div>
 </div>
 
 <div id="editbankModal" class="modal">
@@ -176,9 +176,9 @@
           <label for="editBankAccountNumber">เลขบัญชี:</label>
           <input type="text" id="editBankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
         </div>
+        <div id="alertMessageEditBank" class="alert-message-Bank"></div>
         <button class="btn btn-shop-save" onclick="saveEditedBank()">บันทึก</button>
     </div>
-    <div id="alertMessageEditBank" class="alert-message-Line"></div>
 </div>
 </div>
   </div> <!-- ปิด .main-page -->

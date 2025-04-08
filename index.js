@@ -12,6 +12,8 @@ import * as crypto from "crypto";
 import { handleEvent, reloadSettings } from "./handlers/duplicateSlipHandler.js";
 import { loadSettings, saveSettings } from './config/settings.js';
 import { loadSlipResults, saveSlipResults } from "./utils/slipStatsManager.js";
+import isEqual from "lodash.isequal"; // ✅ แทน deepEqual
+
 
 dotenv.config({ path: `${process.cwd()}/info.env` });
 
@@ -119,6 +121,63 @@ app.get("/events", (req, res) => {
   });
 });
 
+let bankAccounts = {};
+
+function loadBankAccounts() {
+  try {
+    const filePath = path.join(__dirname, "bank_accounts.json");
+    if (!fs.existsSync(filePath)) {
+      console.warn("⚠️ ไม่พบไฟล์ bank_accounts.json, สร้างใหม่");
+      bankAccounts = {};
+      fs.writeFileSync(filePath, JSON.stringify({ accounts: {} }, null, 2), "utf-8");
+      return;
+    }
+
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const json = JSON.parse(raw);
+
+    if (!json.accounts || typeof json.accounts !== "object") {
+      throw new Error("โครงสร้าง bank_accounts.json ไม่ถูกต้อง");
+    }
+
+    bankAccounts = json.accounts;
+  } catch (err) {
+    console.error("❌ โหลด bank_accounts.json ล้มเหลว:", err.message);
+    bankAccounts = {};
+  }
+}
+
+function watchBankAccounts() {
+  const filePath = path.join(__dirname, "bank_accounts.json");
+  let debounceTimer = null;
+
+  fs.watch(filePath, (eventType) => {
+    if (eventType !== "change") return;
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+      try {
+        const raw = fs.readFileSync(filePath, "utf-8");
+        const json = JSON.parse(raw);
+        const newBankAccounts = json.accounts || {};
+
+        if (!isEqual(bankAccounts, newBankAccounts)) {
+          bankAccounts = newBankAccounts;
+          restartWebhooks();
+        } else {
+        }
+      } catch (err) {
+        console.error("❌ ไม่สามารถโหลด bank_accounts.json:", err.message);
+      }
+    }, 500); // รอ 500ms ก่อน reload เพื่อป้องกันซ้ำ
+  });
+}
+
+export function getBankAccounts() {
+  return bankAccounts;
+}
+
 app.get("/api/bank-accounts", (req, res) => {
   try {
     const data = fs.readFileSync("./bank_accounts.json", "utf-8");
@@ -154,8 +213,8 @@ app.post("/api/add-bank", (req, res) => {
     });
 
     fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2));
-    res.json({ success: true });
-    restartWebhooks();
+
+    res.json({ success: true });  // ตอบกลับ
   } catch (err) {
     console.error("❌ ไม่สามารถบันทึกบัญชี:", err.message);
     res.status(500).json({ success: false, message: "ไม่สามารถบันทึกข้อมูล" });
@@ -186,8 +245,8 @@ app.post("/api/edit-bank", (req, res) => {
     json.accounts[prefix][index].account = number;
 
     fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2));
-    res.json({ success: true });
-    restartWebhooks();
+
+    res.json({ success: true });  // ตอบกลับ
   } catch (err) {
     console.error("❌ แก้ไขบัญชีล้มเหลว:", err.message);
     res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการบันทึก" });
@@ -212,10 +271,9 @@ app.post("/api/update-bank-status", (req, res) => {
 
     // อัปเดตสถานะ
     data.accounts[prefix][index].status = status;
-
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-    res.json({ success: true });
-    restartWebhooks();
+
+    res.json({ success: true });  // ตอบกลับ
   } catch (err) {
     console.error("❌ ไม่สามารถอัปเดตสถานะบัญชีได้:", err.message);
     res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการบันทึกข้อมูล" });
@@ -245,8 +303,7 @@ app.post("/api/delete-bank", (req, res) => {
     json.accounts[prefix].splice(index, 1);
     fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2), "utf-8");
 
-    res.json({ success: true });
-    restartWebhooks();
+    res.json({ success: true });  // ตอบกลับ
   } catch (err) {
     console.error("❌ ลบบัญชีล้มเหลว:", err.message);
     res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบบัญชี" });
@@ -444,9 +501,9 @@ app.get('/api/quota', async (req, res) => {
         data.shops.push(newShop);
         // บันทึกข้อมูลลงไฟล์
         fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-        
-        res.json({ success: true });
+
         restartWebhooks();
+        res.json({ success: true });
     } catch (error) {
         console.error("Error adding shop:", error);
         res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มร้านค้า" });
@@ -746,13 +803,17 @@ const setupWebhooks = () => {
         });
     });
 };
-setupWebhooks();
 
 export const restartWebhooks = () => {
-    console.log("🔄 พบการแก้ไขข้อมูลร้านค้า...");
-    broadcastLog("🔄 พบการแก้ไขข้อมูลร้านค้า...");
+    console.log("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
+    broadcastLog("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
+    loadBankAccounts();
     setupWebhooks();
 };
+
+setupWebhooks(); 
+loadBankAccounts();
+watchBankAccounts();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
