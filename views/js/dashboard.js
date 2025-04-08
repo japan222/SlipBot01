@@ -51,6 +51,7 @@ function renderSlipResults(start, end) {
 function getStatusClass(status) {
   switch (status) {
     case "สลิปถูกต้อง":
+    case "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง":
       return "status-success";
 
     case "สลิปซ้ำเดิม":
@@ -58,7 +59,6 @@ function getStatusClass(status) {
       return "status-fail";
 
     case "สลิปยอดเงินต่ำ":
-    case "สลิปซ้ำ ไม่เกิน 1 ชั่วโมง":
     case "ใช้เวลาตรวจสอบนานเกินไป":
     case "พบสลิปต้องสงสัย ( อาจเป็นภาพสลิป แต่ไม่มี QRcode หรือ ปลอมสลิป )":
     case "เกิดข้อผิดพลาดระหว่างตรวจสอบ รอแอดมินตรวจสอบ":

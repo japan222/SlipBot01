@@ -15,7 +15,7 @@
           "secret_token": "a848654e8ea13724ca2715182ac7e240"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {
@@ -59,7 +59,7 @@
       "prefix": "JPN",
       "lines": [
         {
-          "linename": "Japan888",
+          "linename": "Japan 888 ( ติดต่อ )",
           "access_token": "wdxwzJLjBC/PIRXq2TSteAVb6qgf5y7Czf+FAWch2jPXZm9CFaJDxU/KkUpmqRAo15loPPdiPjInp8Mv1u6oGtN0woz4mifQnMANo++L0dQ6ay8Kj+aAmnQnAXe/xK9S6Rv1Slpc5QMQA5ncNYymLgdB04t89/1O/w1cDnyilFU=",
           "secret_token": "46140a24bc8afd1e554a5fc5bebf9ebf"
         },
@@ -71,12 +71,6 @@
       ],
       "status": true,
       "slipCheckOption": "all"
-    },
-    {
-      "name": "Venice",
-      "prefix": "VCE",
-      "lines": [],
-      "status": false
     },
     {
       "name": "Magma",
@@ -99,26 +93,8 @@
     {
       "name": "PGwin",
       "prefix": "PGW",
-      "lines": [
-        {
-          "linename": "PGwwinn",
-          "access_token": "Sm7iIrygemlqYq0c1s9smEFHJPJ7leoWzcSl0HYIEoxIT8qeHNMV7h/mTI2642OjGw/Iw3UW7Zr0NiOxhAo+HR9bIW4wlcLHYMeaMSBj0R4bwWGpFJxU+0q1oLsWBgRE6CnrwuybV9AJlFDEOu/9XwdB04t89/1O/w1cDnyilFU=",
-          "secret_token": "394ff0ed276e6f5bc3c1a83d74ac1c7d"
-        },
-        {
-          "linename": "PGwin(สำรอง)",
-          "access_token": "xVIAD8iWLM5u1Bde2X2aExc6pmjEpd7v2Glc3Mr1qHVdl0EkFY4YOT53efOshUb/FoCspmyFvtutEVXVtp2/b34BciAly/US0RdqVys7uMMZG/vcEINEmC+elN/KN0AGADAOuT0gyxvVp3dxm1+bngdB04t89/1O/w1cDnyilFU=",
-          "secret_token": "5b2702fa5cb53d3c3f92dac5355fc3e4"
-        }
-      ],
-      "status": true,
-      "slipCheckOption": "all"
-    },
-    {
-      "name": "Apollo",
-      "prefix": "APB",
       "lines": [],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {
@@ -136,7 +112,7 @@
           "secret_token": "d0b7f3a1ab9c5e79d2436eb355260c3c"
         }
       ],
-      "status": false,
+      "status": true,
       "slipCheckOption": "all"
     },
     {

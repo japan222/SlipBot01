@@ -149,7 +149,6 @@ async function saveNewLine() {
 
     const apiResult = await apiResponse.json();
     if (apiResult.success) {
-        alert("เพิ่มบัญชี LINE สำเร็จ!");
         closeAddLineModal();
         loadShopLines(currentShopPrefix); // โหลดรายการใหม่
     } else {
@@ -207,7 +206,6 @@ async function deleteLine(prefix, index) {
 
     const result = await response.json();
     if (result.success) {
-        alert("ลบบัญชีไลน์สำเร็จ!");
         loadShopLines(prefix); // โหลดรายการใหม่
     } else {
         alert("เกิดข้อผิดพลาด: " + result.message);
@@ -304,7 +302,6 @@ async function saveEditedLine() {
     console.log("📡 API Response:", apiResult);
 
     if (apiResult.success) {
-        alert("✅ แก้ไขบัญชีไลน์สำเร็จ!");
 
         // ✅ อัปเดตข้อมูลใน shopData ทันที
         const shop = shopData.find(s => s.prefix === currentEditingPrefix);
@@ -441,7 +438,6 @@ async function saveShopChanges() {
 
     const result = await response.json();
     if (result.success) {
-        alert("แก้ไขร้านค้าสำเร็จ!");
         window.location.reload(); // รีเฟรชหน้า
     } else {
         alert("เกิดข้อผิดพลาด: " + result.message, "alertMessageEditShop", false);
@@ -626,32 +622,27 @@ function openBankModal(prefix) {
 }
 
 function openAddBankModal(prefix) {
-    let modal = document.getElementById("addbankModal");
+    const modal = document.getElementById("addbankModal");
 
-    // เปิด Modal
-    modal.style.display = "flex";
-    console.log("เปิด Modal แล้ว");
-
-    // ค้นหาร้านค้าตาม prefix
-    const shop = shopData.find(s => s.prefix === prefix);
-    console.log("shop: ", shop);
-
-    if (!shop) {
-        console.error("ไม่พบข้อมูลร้าน");
+    if (!modal) {
+        console.error("❌ ไม่พบ modal addbankModal");
         return;
     }
 
-    // อัปเดตชื่อร้านใน Modal
-    const shopName = shop.name;
-    console.log("ชื่อร้าน: ", shopName); // ตรวจสอบชื่อร้าน
+    modal.style.display = "flex";
+    modal.dataset.prefix = prefix;  // ✅ เก็บ prefix ไว้ใน modal
 
-    document.getElementById("lineShopNameTitle").textContent = `เพิ่มบัญชีธนาคารสำหรับร้าน: ${shopName}`;
+    const shop = shopData.find(s => s.prefix === prefix);
+    if (!shop) {
+        console.error("❌ ไม่พบข้อมูลร้านสำหรับ prefix:", prefix);
+        document.getElementById("lineShopNameTitle").textContent = "ไม่พบร้าน";
+        return;
+    }
 
-    // รีเซ็ตค่ากรอกข้อมูลใน input fields
+    document.getElementById("lineShopNameTitle").textContent = `เพิ่มบัญชีธนาคารสำหรับร้าน: ${shop.name}`;
     document.getElementById("bankAccountName").value = "";
     document.getElementById("bankAccountNumber").value = "";
 }
-
 
 // ปิด Modal
 function closeAddBankModal() {
@@ -677,7 +668,9 @@ async function toggleBankStatus(prefix, index, checkbox) {
         });
 
         const result = await res.json();
-        if (!result.success) {
+        if (result.success) {
+            openBankModal(prefix);
+        } else {
             alert("ไม่สามารถอัปเดตสถานะบัญชีได้: " + result.message);
             checkbox.checked = !newStatus;
         }
@@ -700,10 +693,79 @@ function openEditBankModal(prefix, index) {
     document.getElementById("editBankAccountName").value = account.name;
     document.getElementById("editBankAccountNumber").value = account.account;
 
+    // ✅ บันทึก prefix และ index ไว้ใน data attribute ของ modal
+    modal.dataset.prefix = prefix;
+    modal.dataset.index = index;
+
     modal.style.display = "flex";
 }
+
 function closeEditBankModal() {
     document.getElementById("editbankModal").style.display = "none";
+}
+
+function saveNewBank() {
+    const modal = document.getElementById("addbankModal");
+    const prefix = modal.dataset.prefix; // ✅ ดึง prefix จาก modal
+    const name = document.getElementById("bankAccountName").value.trim();
+    const number = document.getElementById("bankAccountNumber").value.trim();
+
+    if (!name || !number) {
+        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageShop", false);
+        return;
+    }
+
+    fetch("/api/add-bank", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prefix, name, number })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            closeAddBankModal();
+            openBankModal(prefix); // โหลดใหม่
+            restartWebhooks();
+        } else {
+            showAlertMessage("❌ ไม่สามารถเพิ่มบัญชีธนาคารได้: " + result.message, "alertMessageShop", false);
+        }
+    })
+    .catch(err => {
+        console.error("เกิดข้อผิดพลาดในการเพิ่มบัญชีธนาคาร", err);
+    });
+}
+
+function saveEditedBank() {
+    const modal = document.getElementById("editbankModal");
+    const prefix = modal.dataset.prefix;
+    const index = Number(modal.dataset.index); // อย่าลืมแปลงเป็น number
+
+    const name = document.getElementById("editBankAccountName").value.trim();
+    const number = document.getElementById("editBankAccountNumber").value.trim();
+
+    if (!name || !number) {
+        showAlertMessage("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ", "alertMessageShop", false);
+        return;
+    }
+
+    fetch("/api/edit-bank", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prefix, index, name, number }),
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            closeEditBankModal();
+            openBankModal(prefix);
+        } else {
+            showAlertMessage("❌ ไม่สามารถแก้ไขบัญชีธนาคารได้: " + result.message, "alertMessageShop", false);
+        }
+    })
+    .catch(err => {
+        console.error("เกิดข้อผิดพลาดในการแก้ไขบัญชีธนาคาร:", err);
+        showAlertMessage("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "alertMessageShop", false);
+    });
 }
 
 function deleteBank(prefix, index) {
@@ -716,7 +778,6 @@ function deleteBank(prefix, index) {
         .then((res) => res.json())
         .then((result) => {
             if (result.success) {
-                alert("ลบบัญชีธนาคารเรียบร้อย");
                 openBankModal(prefix);
             } else {
                 alert("ไม่สามารถลบบัญชีธนาคารได้: " + result.message);
@@ -724,37 +785,6 @@ function deleteBank(prefix, index) {
         })
         .catch((err) => {
             console.error("เกิดข้อผิดพลาดในการลบบัญชีธนาคาร", err);
-        });
-}
-
-function saveNewBank(prefix) {
-    const name = document.getElementById("bankAccountName").value.trim();
-    const number = document.getElementById("bankAccountNumber").value.trim();
-
-    if (!name || !number) {
-        alert("กรุณากรอกชื่อบัญชีและเลขบัญชีให้ครบ");
-        return;
-    }
-
-    fetch("/api/add-bank", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prefix, name, number })
-    })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                alert("✅ เพิ่มบัญชีธนาคารสำเร็จ!");
-                document.querySelector(".modal.bank-modal").remove();
-                openBankModal(prefix);
-            } else {
-                alert("❌ ไม่สามารถเพิ่มบัญชีธนาคารได้: " + result.message);
-            }
-        })
-        .catch(err => {
-            console.error("เกิดข้อผิดพลาดในการเพิ่มบัญชีธนาคาร", err);
         });
 }
 
@@ -792,7 +822,6 @@ async function addShop() {
 
     const result = await response.json();
     if (result.success) {
-        alert("เพิ่มร้านค้าสำเร็จ!");
         window.location.reload(); // รีเฟรชหน้า
     } else {
         showAlertMessage(result.message, "alertMessageShop", false);
@@ -815,7 +844,6 @@ async function updateShopStatus(prefix, newStatus) {
 
         const result = await response.json();
         if (result.success) {
-            console.log(`✅ อัปเดตสถานะร้าน ${prefix} เป็น: ${newStatus ? "เปิด" : "ปิด"}`);
         } else {
             console.error(`❌ ไม่สามารถอัปเดตสถานะร้าน: ${result.message}`);
         }
@@ -838,7 +866,6 @@ async function handleToggle(prefix, checkbox) {
 
         const result = await response.json();
         if (result.success) {
-            alert(`เปลี่ยนสถานะร้านค้าเป็น ${newStatus ? "เปิด" : "ปิด"} เรียบร้อย`);
             window.location.reload(); // รีโหลดหน้าเพื่ออัปเดตข้อมูล
         } else {
             alert("❌ ไม่สามารถอัปเดตสถานะร้านค้าได้: " + result.message);
@@ -885,7 +912,6 @@ async function updateSlipCheckOption(prefix, newOption) {
 
         const result = await response.json();
         if (result.success) {
-            alert(`✅ เปลี่ยนตัวเลือกการตรวจสลิปเป็น "${newOption}" สำเร็จ!\nโปรดเปิดร้านใหม่อีกครั้งเพื่อให้มีผล.`);
             window.location.reload(); // รีโหลดหน้าหลังจากเปลี่ยนตัวเลือก
         } else {
             alert(`❌ ไม่สามารถอัปเดตตัวเลือกตรวจสลิป: ${result.message}`);

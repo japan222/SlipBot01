@@ -153,7 +153,7 @@
 }
 
 .main-page .buttons .btn {
-  min-width: 120px; /* กำหนดขนาดขั้นต่ำของปุ่ม */
+  width: 120px; /* กำหนดขนาดขั้นต่ำของปุ่ม */
   padding: 10px 15px; /* ปรับขนาดปุ่มให้ใหญ่ขึ้น */
   font-size: 14px; /* ขนาดตัวอักษร */
   cursor: pointer;
@@ -183,6 +183,7 @@
 .main-page .btn-bank {
   background-color: #28aa00;
   color: #fff;
+  min-width: 150px; /* กำหนดขนาดขั้นต่ำของปุ่ม */
   border: 1px solid #28aa00;
   font-size: 16px;
   border-radius: 10px;

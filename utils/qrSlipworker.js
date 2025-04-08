@@ -14,13 +14,13 @@ const keywords = [
     "จำนวนเงิน", "ยอดเงิน", "ยอดโอน", "ค่าธรรมเนียม", "จำนวน", "รายการโอนเงินสำเร็จ", "สำเนาสลิป", "slip", "transaction",
   
     // กลุ่ม 3: ผู้โอน / ผู้รับ / บัญชี
-    "จาก", "ไปยัง", "ถึง", "ผู้โอน", "ผู้รับ", "ชื่อบัญชี", "เลขที่บัญชี", "เลขบัญชี", "บัญชีธนาคาร", "ชื่อผู้รับ", "ผู้รับเงิน",
+    "จาก", "ไปยัง", "ถึง", "ผู้โอน", "ผู้รับ", "เลขบัญชี", "บัญชีธนาคาร", "ชื่อผู้รับ", "ผู้รับเงิน",
     "from", "to", "beneficiary", "sender", "receiver", "account name", "account holder", "account number",
     "a/c number", "bank account", "recipient", "withdrawer", "amount", "total amount",
     "transaction amount", "transfer amount", "payment amount", "total payment", "fee",
   
     // กลุ่ม 5: ชื่อธนาคาร
-    "ไทยพาณิชย์", "kbank", "กสิกรไทย", "krungthai", "กรุงไทย", "กรุงเทพ", "bangkok bank",
+    "ไทยพาณิชย์", "kbank", "krungthai", "กรุงไทย", "กรุงเทพ", "bangkok bank",
     "ธนชาต", "ออมสิน", "กรุงศรี", "ธนาคารกรุงเทพ", "ธนาคารกสิกรไทย",
     "ธนาคารกรุงไทย", "ธนาคารทหารไทยธนชาต", "ธนาคารไทยพาณิชย์", "ธนาคารออมสิน", "ธนาคารยูโอบี", "ธนาคารซิตี้แบงก์", "ธนาคารซีไอเอ็มบีไทย",
     "ธนาคารกรุงศรีอยุธยา", "ธนาคารธนชาต", "ธนาคารเกียรตินาคินภัทร", "ธนาคารซีไอเอ็มบีไทย", "ธนาคารทิสโก้", "ธนาคารแลนด์แอนด์เฮ้าส์", "ธนาคารไทยเครดิตเพื่อรายย่อย",
@@ -33,13 +33,25 @@ const keywords = [
     "my mo", "krungthai next", "k plus", "scb easy", "tmb touch", "krungsri",
   ];
 
+// ✅ คำที่บ่งบอกว่าเป็นภาพกรณีพิเศษ
+const specialKeywords = [
+  "ฝากเงิน", "เลือกธนาคาร", "ชื่อบัญชี", "ประวัติธุรกรรม", "ฝาก", "ถอน" , "บันทึกใบเสร็จ", "ดูบัญชีของคุณ", "ส่งคำขอโอนเงิน"
+];
+
+
 // ✅ OCR: อ่านข้อความจากภาพ
 async function extractTextFromImage(buffer) {
-    const worker = await createWorker("tha+eng");
-    const { data: { text } } = await worker.recognize(buffer);
-    await worker.terminate();
-    return text.toLowerCase();
-  }
+  const worker = await createWorker("tha+eng");
+  const { data: { text } } = await worker.recognize(buffer);
+  await worker.terminate();
+  return text.toLowerCase();
+}
+
+async function detectSpecialImage(text) {
+const matched = specialKeywords.filter(k => text.includes(k.toLowerCase()));
+return matched.length >= 2;
+}
+  
 
 // ✅ แปลง stream เป็น Buffer (สำรองไว้ใช้กรณีพี่ใช้ stream ภายนอก)
 const streamToBuffer = async (stream) => {
@@ -87,22 +99,27 @@ const scan_qr_code = async (buffer) => {
   }
 };
 
-// ✅ วิเคราะห์ภาพตามที่พี่ต้องการ
+// ✅ วิเคราะห์ภาพตามลำดับเงื่อนไข
 async function analyzeSlipImage(buffer) {
-  const text = await extractTextFromImage(buffer);
-  const matchedKeywords = keywords.filter((k) => text.includes(k.toLowerCase()));
-  const keywordCount = matchedKeywords.length;
-
-  if (keywordCount >= 3) {
-    const qrData = await scan_qr_code(buffer);
-    if (qrData && isBankSlipQR(qrData)) {
-      return qrData; // ✅ เงื่อนไข 1
-    } else {
-      return { suspicious: true }; // ✅ เงื่อนไข 2
-    }
-  } else {
-    return null; // ✅ เงื่อนไข 3
+  const qrData = await scan_qr_code(buffer);
+  if (qrData && isBankSlipQR(qrData)) {
+    return qrData; // ✅ เป็นสลิปจริง มี QR
   }
+
+  // ✅ ถ้าไม่มี QR → OCR ตรวจสอบพิเศษก่อน
+  const text = await extractTextFromImage(buffer);
+
+  if (await detectSpecialImage(text)) {
+    return null; // ✅ เป็นภาพตัวอย่าง ไม่ใช่สลิป
+  }
+
+  const matchedKeywords = keywords.filter((k) => text.includes(k.toLowerCase()));
+  if (matchedKeywords.length >= 3) {
+    return { suspicious: true }; // ✅ สลิปต้องสงสัย
+  }
+
+  return null; // ✅ ไม่ตรงเงื่อนไขใดเลย
 }
+
 
 export { analyzeSlipImage, streamToBuffer };

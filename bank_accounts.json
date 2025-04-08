@@ -1,9 +1,16 @@
 {
     "accounts": {
       "ADN": [
-        { "name": "จิระ แ", "account": "6782481120", "status": false },
-        { "name": "สุทธิพงษ์ น", "account": "1931352586", "status": false },
-        { "name": "สุดารัตน์ แ", "account": "6782481536", "status": false }
+        {
+          "name": "จิระ",
+          "account": "6782481120",
+          "status": false
+        },
+        {
+          "name": "สุทธิพงษ์ น",
+          "account": "1931352586",
+          "status": false
+        }
       ],
       "APB": [],
       "BFU": [],
@@ -13,26 +20,74 @@
       "GHB": [],
       "GNV": [],
       "JDX": [
-        { "name": "กมลสิทธิ์ บ", "account": "5983025392", "status": false },
-        { "name": "ดวงดาว อ", "account": "2322738658", "status": false },
-        { "name": "ปวุฒิ โ", "account": "0224046113", "status": false },
-        { "name": "อมรรัตน์ เ", "account": "6643940591", "status": false }
+        {
+          "name": "กมลสิทธิ์ บ",
+          "account": "5983025392",
+          "status": false
+        },
+        {
+          "name": "ดวงดาว อ",
+          "account": "2322738658",
+          "status": false
+        },
+        {
+          "name": "ปวุฒิ โ",
+          "account": "0224046113",
+          "status": false
+        },
+        {
+          "name": "อมรรัตน์ เ",
+          "account": "6643940591",
+          "status": false
+        }
       ],
       "JEN": [
-        { "name": "วารินทร์ ศ", "account": "0128124438", "status": false },
-        { "name": "แอน ค", "account": "3664856736", "status": false }
+        {
+          "name": "วารินทร์ ศ",
+          "account": "0128124438",
+          "status": false
+        },
+        {
+          "name": "แอน ค",
+          "account": "3664856736",
+          "status": false
+        }
       ],
       "JPN": [
-        { "name": "วารินทร์ ศ", "account": "4290642072", "status": false }
+        {
+          "name": "วารินทร์ ศ",
+          "account": "4290642072",
+          "status": false
+        }
       ],
       "JYX": [
-        { "name": "เบญจวรรณ พ", "account": "7752448027", "status": false },
-        { "name": "ชนิดาภา ม", "account": "9090861825", "status": false }
+        {
+          "name": "เบญจวรรณ พ",
+          "account": "7752448027",
+          "status": false
+        },
+        {
+          "name": "ชนิดาภา ม",
+          "account": "9090861825",
+          "status": false
+        }
       ],
       "KRM": [
-        { "name": "ปรีชา เ", "account": "1733397078", "status": false },
-        { "name": "กัณหา แ", "account": "6782479652", "status": false },
-        { "name": "จำปี ร", "account": "6782487663", "status": false }
+        {
+          "name": "ปรีชา เ",
+          "account": "1733397078",
+          "status": false
+        },
+        {
+          "name": "กัณหา แ",
+          "account": "6782479652",
+          "status": false
+        },
+        {
+          "name": "จำปี ร",
+          "account": "6782487663",
+          "status": false
+        }
       ],
       "LUX": [],
       "MMA": [],
@@ -44,4 +99,3 @@
       "BFB": []
     }
   }
-  
