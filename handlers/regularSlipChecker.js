@@ -5,12 +5,13 @@ import { sendMessageOld } from "../reply/oldpic_reply.js";
 import { sendMessageWrong } from "../reply/wrong_reply.js";
 import { sendMessageMinimum } from "../reply/minimum_reply.js";
 import { sendImageToSlipOK } from "./slipService.js"; 
-import { saveQRDatabaseToFile } from "../qrdata/qrData.js";
+import { saveQRDatabaseToFile } from "../utils/qrData.js";
 import bankCodeMapping from "../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../utils/slipStatsManager.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
-import { broadcastLog, getBankAccounts } from "../index.js";
+import { broadcastLog } from "../index.js";
 import { isAccountNumberMatch } from "../utils/accountUtils.js";
+import BankAccount from "../models/BankAccount.js";
 
 /**
  * ฟังก์ชันสำหรับตรวจสอบสลิปแบบปกติ
@@ -32,8 +33,6 @@ export async function handleRegularSlip(
   qrDatabase,
   qrData,
   userId,
-  userMessageCount, // ✅ เพิ่มเข้ามา
-  userInfo,
   lineName,
   image,
   linename,
@@ -42,8 +41,7 @@ export async function handleRegularSlip(
   try {
     const now = Date.now();
     const slipOKResponse = await sendImageToSlipOK(client, messageId);
-    const bankAccounts = getBankAccounts();
-    const accountData = bankAccounts[prefix] || [];
+    const bankList = await BankAccount.find({ prefix });
 
     const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
       hour: "2-digit",
@@ -75,11 +73,11 @@ export async function handleRegularSlip(
       qrDatabase.set(qrData, qrEntry);
       saveQRDatabaseToFile(prefix, qrDatabase);
 
-        if (accountData.length === 0) {
+        if (bankList.length === 0) {
           console.log("ไม่มีบัญชีในร้านนี้");
           broadcastLog("ไม่มีบัญชีในร้านนี้");
         } else {
-          const activeAccounts = accountData.filter(account => account.status === true);
+          const activeAccounts = bankList.filter(acc => acc.status === true); // ✅ คัดเฉพาะบัญชีที่เปิด
       
               if (activeAccounts.length === 0) {
                 console.log("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่เปิดใช้ในการตรวจสอบ.... ");
@@ -221,7 +219,6 @@ export async function handleRegularSlip(
             return { amount: Amount };
           }        
             if (slipOKResponse.status === "Wait") {
-              const errorMessage = slipOKResponse?.data || "ไม่สามารถตรวจสอบได้";
               const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
                 hour: "2-digit",
                 minute: "2-digit",

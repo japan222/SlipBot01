@@ -1,7 +1,0 @@
-{
-  "timeLimit": 120000,
-  "sameQrTimeLimit": 3600000,
-  "maxMessagesPerUser": 3,
-  "maxMessagesSamePerUser": 2,
-  "maxProcessingPerUser": 2
-}

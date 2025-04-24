@@ -1,21 +1,23 @@
 // index.js
 import express from "express";
 import * as line from "@line/bot-sdk";
-import dotenv from "dotenv";
-import fs from "fs";
 import session from "express-session"; // สำหรับจัดการ session
 import { validateAccessToken } from "./utils/lcf.js"; // แยกฟังก์ชันออกไปอยู่ไฟล์อื่น
 import path from "path";
 import { fileURLToPath } from "url";
 import credentials from "./credentials.js";
 import * as crypto from "crypto";
-import { handleEvent, reloadSettings } from "./handlers/duplicateSlipHandler.js";
-import { loadSettings, saveSettings } from './config/settings.js';
-import { loadSlipResults, saveSlipResults } from "./utils/slipStatsManager.js";
-import isEqual from "lodash.isequal"; // ✅ แทน deepEqual
+import { handleEvent } from "./handlers/duplicateSlipHandler.js";
+import { loadSettings, saveSettings, reloadSettings } from './utils/settingsManager.js';
+import BankAccount from "./models/BankAccount.js";
+import Shop from "./models/Shop.js";
+import dotenv from "dotenv";
+import SlipResult from "./models/SlipResult.js"; // เพิ่มตรงนี้
+import SlipStat from "./models/SlipStats.js"; 
 
+dotenv.config({ path: `${process.cwd()}/info.env` }); // ← มาโหลดตรงนี้ช้าไปแล้ว
 
-dotenv.config({ path: `${process.cwd()}/info.env` });
+import { connectDB } from "./mongo.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +27,6 @@ const clients = [];
 const MAX_LOGS = 200;
 const logHistory = [];
 const logClients = [];
-const SLIP_STATS_PATH = path.join(__dirname, "stats", "slipStats.json");
 
 // ✅ ตั้ง session ไว้ก่อนเสมอ
 app.use(session({
@@ -55,7 +56,6 @@ app.use(express.json());
 
 
 let shopData = [];
-let slipResults = loadSlipResults();
 
 // Endpoint สำหรับส่ง Logs แบบเรียลไทม์
 app.get("/api/logs", (req, res) => {
@@ -123,73 +123,40 @@ app.get("/events", (req, res) => {
 
 let bankAccounts = {};
 
-function loadBankAccounts() {
+export async function loadBankAccounts() {
   try {
-    const filePath = path.join(__dirname, "bank_accounts.json");
-    if (!fs.existsSync(filePath)) {
-      console.warn("⚠️ ไม่พบไฟล์ bank_accounts.json, สร้างใหม่");
-      bankAccounts = {};
-      fs.writeFileSync(filePath, JSON.stringify({ accounts: {} }, null, 2), "utf-8");
-      return;
+    const all = await BankAccount.find();
+    const grouped = {};
+    for (const entry of all) {
+      if (!grouped[entry.prefix]) grouped[entry.prefix] = [];
+      grouped[entry.prefix].push({
+        name: entry.name,
+        account: entry.account,
+        status: entry.status
+      });
     }
-
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const json = JSON.parse(raw);
-
-    if (!json.accounts || typeof json.accounts !== "object") {
-      throw new Error("โครงสร้าง bank_accounts.json ไม่ถูกต้อง");
-    }
-
-    bankAccounts = json.accounts;
+    bankAccounts = grouped;
   } catch (err) {
-    console.error("❌ โหลด bank_accounts.json ล้มเหลว:", err.message);
+    console.error("❌ โหลดบัญชีธนาคารล้มเหลว:", err.message);
     bankAccounts = {};
   }
 }
 
-function watchBankAccounts() {
-  const filePath = path.join(__dirname, "bank_accounts.json");
-  let debounceTimer = null;
-
-  fs.watch(filePath, (eventType) => {
-    if (eventType !== "change") return;
-
-    if (debounceTimer) clearTimeout(debounceTimer);
-
-    debounceTimer = setTimeout(() => {
-      try {
-        const raw = fs.readFileSync(filePath, "utf-8");
-        const json = JSON.parse(raw);
-        const newBankAccounts = json.accounts || {};
-
-        if (!isEqual(bankAccounts, newBankAccounts)) {
-          bankAccounts = newBankAccounts;
-          restartWebhooks();
-        } else {
-        }
-      } catch (err) {
-        console.error("❌ ไม่สามารถโหลด bank_accounts.json:", err.message);
-      }
-    }, 500); // รอ 500ms ก่อน reload เพื่อป้องกันซ้ำ
-  });
-}
-
+// ✅ ให้เรียกใช้ตัวแปร global
 export function getBankAccounts() {
   return bankAccounts;
 }
 
 app.get("/api/bank-accounts", (req, res) => {
   try {
-    const data = fs.readFileSync("./bank_accounts.json", "utf-8");
-    const accounts = JSON.parse(data);
-    res.json(accounts);
+    res.json({ accounts: bankAccounts });
   } catch (err) {
-    console.error("❌ โหลด bank_accounts.json ไม่สำเร็จ:", err.message);
+    console.error("❌ โหลดบัญชีล้มเหลว:", err.message);
     res.status(500).json({ error: "โหลดบัญชีไม่สำเร็จ" });
   }
 });
 
-app.post("/api/add-bank", (req, res) => {
+app.post("/api/add-bank", async (req, res) => {
   const { prefix, name, number } = req.body;
 
   if (!prefix || !name || !number) {
@@ -197,31 +164,22 @@ app.post("/api/add-bank", (req, res) => {
   }
 
   try {
-    const raw = fs.readFileSync("./bank_accounts.json", "utf-8");
-    const json = JSON.parse(raw);
-
-    // ✅ ถ้ายังไม่มี prefix ให้สร้างใหม่
-    if (!json.accounts[prefix]) {
-      json.accounts[prefix] = [];
-    }
-
-    // ✅ เพิ่มบัญชีใหม่โดยใช้ status: false
-    json.accounts[prefix].push({
+    await BankAccount.create({
+      prefix,
       name,
       account: number,
-      status: false,
+      status: false
     });
 
-    fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2));
-
-    res.json({ success: true });  // ตอบกลับ
+    await loadBankAccounts(); // Reload global variable
+    res.json({ success: true });
   } catch (err) {
-    console.error("❌ ไม่สามารถบันทึกบัญชี:", err.message);
+    console.error("❌ ไม่สามารถเพิ่มบัญชี:", err.message);
     res.status(500).json({ success: false, message: "ไม่สามารถบันทึกข้อมูล" });
   }
 });
 
-app.post("/api/edit-bank", (req, res) => {
+app.post("/api/edit-bank", async (req, res) => {
   const { prefix, index, name, number } = req.body;
 
   if (
@@ -234,53 +192,44 @@ app.post("/api/edit-bank", (req, res) => {
   }
 
   try {
-    const raw = fs.readFileSync("./bank_accounts.json", "utf-8");
-    const json = JSON.parse(raw);
-
-    if (!json.accounts[prefix] || !json.accounts[prefix][index]) {
+    const accounts = await BankAccount.find({ prefix });
+    if (!accounts[index]) {
       return res.status(404).json({ success: false, message: "ไม่พบบัญชีธนาคารที่ต้องการแก้ไข" });
     }
 
-    json.accounts[prefix][index].name = name;
-    json.accounts[prefix][index].account = number;
-
-    fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2));
-
-    res.json({ success: true });  // ตอบกลับ
+    accounts[index].name = name;
+    accounts[index].account = number;
+    await accounts[index].save();
+    restartWebhooks(); // รีโหลด Webhook ใหม่
+    res.json({ success: true });
   } catch (err) {
     console.error("❌ แก้ไขบัญชีล้มเหลว:", err.message);
     res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการบันทึก" });
   }
 });
 
-app.post("/api/update-bank-status", (req, res) => {
+app.post("/api/update-bank-status", async (req, res) => {
   const { prefix, index, status } = req.body;
 
   try {
-    const filePath = "./bank_accounts.json";
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const data = JSON.parse(raw);
-
-    if (!data.accounts[prefix]) {
-      return res.status(404).json({ success: false, message: "ไม่พบร้านค้า" });
+    const accounts = await BankAccount.find({ prefix });
+    if (!accounts[index]) {
+      return res.status(404).json({ success: false, message: "ไม่พบบัญชีธนาคาร" });
     }
 
-    if (!data.accounts[prefix][index]) {
-      return res.status(404).json({ success: false, message: "ไม่พบบัญชีธนาคารในตำแหน่งที่ระบุ" });
-    }
+    accounts[index].status = status;
+    await accounts[index].save(); // ✅ สำคัญมาก ต้อง save หลังเปลี่ยนค่า
 
-    // อัปเดตสถานะ
-    data.accounts[prefix][index].status = status;
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-
-    res.json({ success: true });  // ตอบกลับ
+    await loadBankAccounts();     // ✅ รีโหลด global variable ให้บอทเห็นค่าที่เปลี่ยน
+    await setupWebhooks();        // ✅ รีโหลด webhook
+    res.json({ success: true });
   } catch (err) {
     console.error("❌ ไม่สามารถอัปเดตสถานะบัญชีได้:", err.message);
-    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการบันทึกข้อมูล" });
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาด" });
   }
 });
 
-app.post("/api/delete-bank", (req, res) => {
+app.post("/api/delete-bank", async (req, res) => {
   const { prefix, index } = req.body;
 
   if (typeof prefix !== "string" || typeof index !== "number") {
@@ -288,22 +237,15 @@ app.post("/api/delete-bank", (req, res) => {
   }
 
   try {
-    const raw = fs.readFileSync("./bank_accounts.json", "utf-8");
-    const json = JSON.parse(raw);
-
-    // เช็กว่ามีร้านนี้ไหม
-    if (!json.accounts[prefix]) {
-      return res.status(404).json({ success: false, message: "ไม่พบร้านนี้" });
+    const accounts = await BankAccount.find({ prefix });
+    if (!accounts[index]) {
+      return res.status(404).json({ success: false, message: "ไม่พบบัญชีธนาคารในตำแหน่งนี้" });
     }
-    // เช็ก index ถูกต้องไหม
-    if (!json.accounts[prefix][index]) {
-      return res.status(404).json({ success: false, message: "ไม่พบบัญชีในตำแหน่งนี้" });
-    }
-    // ลบ
-    json.accounts[prefix].splice(index, 1);
-    fs.writeFileSync("./bank_accounts.json", JSON.stringify(json, null, 2), "utf-8");
 
-    res.json({ success: true });  // ตอบกลับ
+    const accountToDelete = accounts[index];
+    await BankAccount.deleteOne({ _id: accountToDelete._id });
+
+    res.json({ success: true, message: "ลบบัญชีสำเร็จ" });
   } catch (err) {
     console.error("❌ ลบบัญชีล้มเหลว:", err.message);
     res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบบัญชี" });
@@ -311,44 +253,55 @@ app.post("/api/delete-bank", (req, res) => {
 });
 
 
-function removeOldSlips() {
-  const now = new Date();
-  slipResults = slipResults.filter((item) => {
-    const created = new Date(item.createdAt || item.time);
-    return (now - created) <= 24 * 60 * 60 * 1000;
-  });
-  saveSlipResults(slipResults); // 🟢 อัปเดตไฟล์ด้วย
+// ✅ POST: รับ slip ใหม่ + บันทึก MongoDB + broadcast
+app.post("/api/slip-results", async (req, res) => {
+  try {
+    const newSlip = {
+      ...req.body,
+      createdAt: new Date() // สำคัญสำหรับ TTL 24 ชม.
+    };
+
+    await SlipResult.create(newSlip);
+
+    // ✅ ส่ง SSE ทันที
+    const data = `data: ${JSON.stringify(newSlip)}\n\n`;
+    clients.forEach(client => client.write(data));
+
+    res.status(201).json({ message: "บันทึกแล้ว" });
+  } catch (err) {
+    console.error("❌ บันทึก SlipResult ล้มเหลว:", err.message);
+    res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+  }
+});
+
+// ✅ GET: ดึง slip ล่าสุด 100 รายการ (ภายใน 24 ชม.)
+app.get("/api/slip-results", async (req, res) => {
+  try {
+    const now = new Date();
+    const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+
+    const results = await SlipResult.find({
+      createdAt: { $gte: oneDayAgo }
+    })
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    res.json(results);
+  } catch (err) {
+    console.error("❌ โหลด slip results ล้มเหลว:", err.message);
+    res.status(500).json({ message: "โหลดข้อมูลไม่สำเร็จ" });
+  }
+});
+
+export async function loadShopData() {
+  try {
+    shopData = await Shop.find().lean(); // ดึงจาก MongoDB แล้วเก็บในตัวแปร global
+  } catch (error) {
+    console.error("❌ ไม่สามารถโหลดร้านค้าจาก MongoDB:", error.message);
+    broadcastLog(`❌ ไม่สามารถโหลดร้านค้าจาก MongoDB: ${error.message}`);
+    shopData = [];
+  }
 }
-
-app.post("/api/slip-results", (req, res) => {
-  const newSlip = req.body;
-  newSlip.createdAt = new Date();
-
-  slipResults.push(newSlip);
-  removeOldSlips(); // ลบเก่าออกก่อน
-  saveSlipResults(slipResults); // ✅ บันทึกไฟล์
-  res.status(201).send({ message: "บันทึกแล้ว" });
-
-  const data = `data: ${JSON.stringify(newSlip)}\n\n`;
-  clients.forEach(client => client.write(data));
-});
-
-app.get("/api/slip-results", (req, res) => {
-  removeOldSlips(); // ลบ + บันทึก
-  res.json(slipResults);
-});
-
-const loadShopData = () => {
-    try {
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        const jsonData = JSON.parse(rawData);
-        shopData = jsonData.shops || [];
-      } catch (error) {
-        console.error("❌ ไม่สามารถโหลด line_shops.json:", error.message);
-        broadcastLog(`❌ ไม่สามารถโหลด line_shops.json: ${error.message}`);
-        shopData = [];
-    }
-};
 
 // ✅ Auth middleware
 function isAuthenticated(req, res, next) {
@@ -428,15 +381,13 @@ app.post("/api/validate-access-token", async (req, res) => {
 });
 
 
-// 4) Endpoint สำหรับส่งข้อมูลร้านค้าใน line_shops.json ให้ Frontend
-app.get("/api/shops", (req, res) => {
+// 4) Endpoint สำหรับส่งข้อมูลร้านค้า
+app.get("/api/shops", async (req, res) => {
   try {
-    const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-    const jsonData = JSON.parse(rawData);
-    // ส่งข้อมูลร้านค้ากลับไป (โครงสร้าง { shops: [...] })
-    res.json(jsonData);
+    const shops = await Shop.find(); // ดึงข้อมูลทั้งหมดจาก MongoDB
+    res.json({ shops });
   } catch (error) {
-    console.error("❌ ไม่สามารถอ่านไฟล์ line_shops.json:", error.message);
+    console.error("❌ ไม่สามารถโหลดข้อมูลร้านค้าจาก MongoDB:", error.message);
     res.status(500).json({ error: "ไม่สามารถโหลดข้อมูลร้านค้าได้" });
   }
 });
@@ -462,287 +413,239 @@ app.get('/api/quota', async (req, res) => {
     }
   });
 
-  app.post("/api/add-shop", (req, res) => {
+  app.post("/api/add-shop", async (req, res) => {
     const { name, prefix } = req.body;
-    
+  
     if (!name || !prefix) {
       return res.status(400).json({ success: false, message: "กรุณากรอกข้อมูลให้ครบ" });
+    }  
+
+    try {
+      // ตรวจสอบว่ามี prefix ซ้ำหรือไม่
+      const existingShop = await Shop.findOne({ prefix });
+      if (existingShop) {
+        return res.status(400).json({ success: false, message: "Prefix นี้ถูกใช้ไปแล้ว" });
+      }
+  
+      // ตรวจสอบ prefix กับ slipStats
+      const existingStat = await SlipStat.findOne({ prefix });
+
+      if (!existingStat) {
+        return res.status(400).json({
+          success: false,
+          message: `ไม่สามารถเพิ่มร้านได้: prefix '${prefix}' ไม่อยู่ในระบบ`
+        });
+      }
+  
+      // บันทึกร้านค้าใหม่ลง MongoDB
+      const newShop = new Shop({
+        name,
+        prefix,
+        lines: [],
+        status: false,
+        slipCheckOption: "duplicate"
+      });
+      await newShop.save();
+  
+      restartWebhooks(); // รีโหลด Webhook ใหม่
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error adding shop:", error);
+      res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มร้านค้า" });
+    }
+  });
+
+// API สำหรับแก้ไขบัญชี LINE
+app.post("/api/update-line", async (req, res) => {
+  const { prefix, index, linename, access_token, secret_token } = req.body;
+
+  if (!prefix || index === undefined || !linename || !access_token || !secret_token) {
+    return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
   }
 
   try {
-      // อ่านข้อมูลร้านค้าปัจจุบัน
-      const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-      let data = JSON.parse(rawData);
-
-      // ตรวจสอบว่ามี prefix ซ้ำหรือไม่
-      if (data.shops.some(shop => shop.prefix === prefix)) {
-          return res.status(400).json({ success: false, message: "Prefix นี้ถูกใช้ไปแล้ว" });
-      }
-
-      // ✅ ตรวจสอบ prefix ว่าอยู่ใน slipStats หรือไม่
-      const prefixStatsRaw = fs.readFileSync(SLIP_STATS_PATH, "utf-8");
-      const prefixStats = JSON.parse(prefixStatsRaw);
-
-      if (!prefixStats.hasOwnProperty(prefix)) {
-          return res.status(400).json({
-              success: false,
-              message: `ไม่สามารถเพิ่มร้านได้: prefix '${prefix}' ไม่อยู่ในระบบ`
-          });
-      }
-
-        // เพิ่มร้านค้าใหม่
-        const newShop = {
-            name,
-            prefix,
-            lines: [],
-            status: false, // ร้านใหม่เริ่มต้นที่ปิดอยู่
-            slipCheckOption: "duplicate", // ตัวเลือกตรวจสอบสลิปเริ่มต้นเป็น duplicate
-        };
-        data.shops.push(newShop);
-        // บันทึกข้อมูลลงไฟล์
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-
-        restartWebhooks();
-        res.json({ success: true });
-    } catch (error) {
-        console.error("Error adding shop:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มร้านค้า" });
-    }
-});
-
-// API สำหรับแก้ไขบัญชี LINE
-app.post("/api/update-line", (req, res) => {
-    const { prefix, index, linename, access_token, secret_token } = req.body;
-
-    if (!prefix || index === undefined || !linename || !access_token || !secret_token) {
-        return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
+    const shop = await Shop.findOne({ prefix });
+    if (!shop) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
     }
 
-    try {
-        // โหลดข้อมูลร้านค้าทั้งหมด
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
-
-        // ค้นหาร้านค้าตาม prefix
-        let shop = data.shops.find(s => s.prefix === prefix);
-        if (!shop) {
-            return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
-        }
-
-        // ตรวจสอบว่าดัชนี (index) มีอยู่จริง
-        if (!shop.lines[index]) {
-            return res.status(404).json({ success: false, message: "ไม่พบบัญชี LINE ที่ต้องการแก้ไข" });
-        }
-
-        // อัปเดตข้อมูลบัญชี LINE
-        shop.lines[index] = {
-            linename,
-            access_token,
-            secret_token
-        };
-
-        // ✅ บันทึกข้อมูลลงไฟล์ (ไม่ใช้ async เพราะต้องให้การบันทึกเสร็จก่อน)
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-
-        res.json({ success: true, message: "อัปเดตบัญชี LINE สำเร็จ!" });
-    } catch (error) {
-        console.error("❌ Error updating LINE account:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตบัญชี LINE" });
+    if (!shop.lines || !shop.lines[index]) {
+      return res.status(404).json({ success: false, message: "ไม่พบบัญชี LINE ที่ต้องการแก้ไข" });
     }
+
+    shop.lines[index] = {
+      linename,
+      access_token,
+      secret_token
+    };
+
+    await shop.save();
+    res.json({ success: true, message: "อัปเดตบัญชี LINE สำเร็จ!" });
+  } catch (error) {
+    console.error("❌ Error updating LINE account:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตบัญชี LINE" });
+  }
 });
 
 // ✅ API อัปเดตชื่อร้าน และสถานะร้านค้า
-app.post("/api/update-shop", (req, res) => {
-    const { prefix, name, status } = req.body;
+app.post("/api/update-shop", async (req, res) => {
+  const { prefix, name, status } = req.body;
 
-    if (!prefix) {
-        return res.status(400).json({ success: false, message: "กรุณาระบุ prefix ของร้านค้า" });
+  if (!prefix) {
+    return res.status(400).json({ success: false, message: "กรุณาระบุ prefix ของร้านค้า" });
+  }
+
+  try {
+    const shop = await Shop.findOne({ prefix });
+
+    if (!shop) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
     }
 
-    try {
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
-        let shop = data.shops.find(s => s.prefix === prefix);
-    
-        if (!shop) {
-          return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
-        }
-    
-        if (name) {
-          shop.name = name;
-        }
-    
-        if (typeof status === "boolean") {
-          shop.status = status;
-        }
-    
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-    
-        restartWebhooks(); // ✅ รีโหลด Webhook เมื่ออัปเดตร้านค้า
-    
-        res.json({ success: true, message: "อัปเดตร้านค้าเรียบร้อย" });
-      } catch (error) {
-        console.error("❌ Error updating shop:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตร้านค้า" });
-      }
-    });
+    if (name) shop.name = name;
+    if (typeof status === "boolean") shop.status = status;
+
+    await shop.save();
+    restartWebhooks();
+
+    res.json({ success: true, message: "อัปเดตร้านค้าเรียบร้อย" });
+  } catch (error) {
+    console.error("❌ Error updating shop:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตร้านค้า" });
+  }
+});
+
 
 // เพิ่ม API สำหรับลบบัญชี LINE
-app.post("/api/delete-line", (req, res) => {
-    const { prefix, index } = req.body;
-    
-    if (!prefix || index === undefined) {
-        return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
+app.post("/api/delete-line", async (req, res) => {
+  const { prefix, index } = req.body;
+
+  if (!prefix || index === undefined) {
+    return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
+  }
+
+  try {
+    const shop = await Shop.findOne({ prefix });
+    if (!shop) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
     }
 
-    try {
-        // อ่านข้อมูลร้านค้าจากไฟล์ line_shops.json
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
-
-        // ค้นหาร้านค้า
-        const shop = data.shops.find(s => s.prefix === prefix);
-        if (!shop) {
-            return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
-        }
-
-        // ตรวจสอบว่ามี index ที่ถูกต้อง
-        if (shop.lines[index] === undefined) {
-            return res.status(404).json({ success: false, message: "ไม่พบบัญชี LINE ที่ต้องการลบ" });
-        }
-
-        // ลบบัญชี LINE จาก array
-        shop.lines.splice(index, 1);
-
-        // บันทึกข้อมูลใหม่ลงในไฟล์
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-
-        // ส่งคำตอบกลับ
-        res.json({ success: true, message: "ลบบัญชี LINE สำเร็จ!" });
-    } catch (error) {
-        console.error("❌ Error deleting line:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบบัญชี LINE" });
+    if (!shop.lines || shop.lines.length <= index) {
+      return res.status(404).json({ success: false, message: "ไม่พบบัญชี LINE ที่ต้องการลบ" });
     }
+
+    shop.lines.splice(index, 1);
+    await shop.save();
+
+    res.json({ success: true, message: "ลบบัญชี LINE สำเร็จ!" });
+  } catch (error) {
+    console.error("❌ Error deleting LINE account:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบบัญชี LINE" });
+  }
 });
 
 // API สำหรับเพิ่มบัญชี LINE ใหม่เข้าไปในร้านค้า
-app.post("/api/add-line", (req, res) => {
-    const { prefix, linename, access_token, secret_token } = req.body;
+app.post("/api/add-line", async (req, res) => {
+  const { prefix, linename, access_token, secret_token } = req.body;
 
-    // ✅ ตรวจสอบว่าข้อมูลที่ส่งมาครบถ้วนหรือไม่
-    if (!prefix || !linename || !access_token || !secret_token) {
-        return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน!" });
+  if (!prefix || !linename || !access_token || !secret_token) {
+    return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน!" });
+  }
+
+  try {
+    const shop = await Shop.findOne({ prefix });
+    if (!shop) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้!" });
     }
 
-    try {
-        // ✅ โหลดข้อมูลร้านค้าทั้งหมดจากไฟล์
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
-
-        // ✅ ค้นหาร้านค้าตาม prefix
-        let shop = data.shops.find(s => s.prefix === prefix);
-        if (!shop) {
-            return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้!" });
-        }
-
-        // ✅ ตรวจสอบว่ามีชื่อบัญชี LINE ซ้ำหรือไม่
-        if (shop.lines.some(line => line.linename === linename)) {
-            return res.status(400).json({ success: false, message: "ชื่อบัญชี LINE นี้มีอยู่แล้ว!" });
-        }
-
-        // ✅ เพิ่มบัญชี LINE ใหม่เข้าไปในร้านค้า
-        shop.lines.push({ linename, access_token, secret_token });
-
-        // ✅ บันทึกข้อมูลร้านค้าลงไฟล์
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-        restartWebhooks();
-
-        res.json({ success: true, message: "เพิ่มบัญชี LINE สำเร็จ!" });
-    } catch (error) {
-        console.error("❌ Error adding LINE account:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มบัญชี LINE" });
+    const duplicate = shop.lines.some(line => line.linename === linename);
+    if (duplicate) {
+      return res.status(400).json({ success: false, message: "ชื่อบัญชี LINE นี้มีอยู่แล้ว!" });
     }
+
+    shop.lines.push({ linename, access_token, secret_token });
+    await shop.save();
+
+    restartWebhooks();
+    res.json({ success: true, message: "เพิ่มบัญชี LINE สำเร็จ!" });
+  } catch (error) {
+    console.error("❌ Error adding LINE account:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการเพิ่มบัญชี LINE" });
+  }
 });
+
 
 app.post("/api/update-slip-option", async (req, res) => {
-    const { prefix, slipCheckOption } = req.body;
+  const { prefix, slipCheckOption } = req.body;
 
-    if (!prefix || !slipCheckOption) {
-        return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
-    }
+  if (!prefix || !slipCheckOption) {
+    return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
+  }
 
-    try {
-        // โหลดข้อมูลร้านค้าทั้งหมด
-        const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-        let data = JSON.parse(rawData);
-
-        // ค้นหาร้านค้าตาม prefix
-        let shop = data.shops.find(s => s.prefix === prefix);
-        if (!shop) {
-            return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
-        }
-
-        // ✅ ปิดร้านก่อนเปลี่ยนตัวเลือก
-        shop.status = false;
-        shop.slipCheckOption = slipCheckOption;
-
-        // บันทึกข้อมูลใหม่ลงไฟล์
-        fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf-8");
-
-        res.json({ success: true, message: "บันทึกการเปลี่ยนแปลงสำเร็จ" });
-    } catch (error) {
-        console.error("❌ Error updating slip check option:", error);
-        res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตตัวเลือกตรวจสลิป" });
-    }
-});
-
-app.get('/api/settings', (req, res) => {
-  const settings = loadSettings();
-
-  // แปลง ms → s เพื่อให้แสดงใน form ได้ถูกต้อง
-  res.json({
-    ...settings,
-    timeLimit: settings.timeLimit / 1000,
-    sameQrTimeLimit: settings.sameQrTimeLimit / 1000
-  });
-});
-
-app.post('/api/settings', (req, res) => {
   try {
-    saveSettings(req.body);
-    reloadSettings(); // ✅ โหลดใหม่เข้าตัวแปร global
-    restartWebhooks(); // ✅ ถ้าจำเป็น
+    const shop = await Shop.findOne({ prefix });
+    if (!shop) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้านี้" });
+    }
+
+    shop.status = false;
+    shop.slipCheckOption = slipCheckOption;
+    await shop.save();
+
+    res.json({ success: true, message: "บันทึกการเปลี่ยนแปลงสำเร็จ" });
+  } catch (error) {
+    console.error("❌ Error updating slip check option:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการอัปเดตตัวเลือกตรวจสลิป" });
+  }
+});
+
+
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await loadSettings(); // 👉 โหลดจาก MongoDB
+    if (!settings) throw new Error("ไม่พบ settings");
+
+    // ✅ แปลง ms → s สำหรับ frontend
+    res.json({
+      ...settings,
+      timeLimit: settings.timeLimit / 1000,
+      sameQrTimeLimit: settings.sameQrTimeLimit / 1000
+    });
+  } catch (err) {
+    console.error("❌ โหลด settings ไม่สำเร็จ:", err.message);
+    res.status(500).json({ error: "โหลด settings ไม่สำเร็จ" });
+  }
+});
+
+app.post('/api/settings', async (req, res) => {
+  try {
+    await saveSettings(req.body); // 👉 บันทึกลง MongoDB
+    await reloadSettings(); // 👉 โหลดใหม่เข้าตัวแปร global
+    restartWebhooks();     // 👉 ถ้าจำเป็นต้องใช้ settings กับ webhook
     res.json({ success: true });
   } catch (err) {
+    console.error("❌ บันทึก settings ไม่สำเร็จ:", err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
-  
+
 // Endpoint สำหรับลบร้านค้า
-app.post("/api/delete-shop", (req, res) => {
-    const { prefix } = req.body;
-    try {
-      // อ่านข้อมูลร้านค้าจากไฟล์ line_shops.json
-      const rawData = fs.readFileSync("./line_shops.json", "utf8");
-      let data = JSON.parse(rawData);
-      // เก็บร้านค้าที่ไม่มี prefix ตรงกับที่ระบุไว้
-      const filteredShops = data.shops.filter((shop) => shop.prefix !== prefix);
-      
-      // หากไม่มีการเปลี่ยนแปลงหมายความว่าไม่พบร้านที่ต้องการลบ
-      if (filteredShops.length === data.shops.length) {
-        return res.status(404).json({ success: false, message: "ไม่พบร้านค้าด้วย prefix นี้" });
-      }
-      
-      // อัปเดตข้อมูลร้านค้า
-      data.shops = filteredShops;
-      // เขียนข้อมูลที่อัปเดตลงในไฟล์ใหม่ (มีการจัดรูปแบบให้อ่านง่าย)
-      fs.writeFileSync("./line_shops.json", JSON.stringify(data, null, 2), "utf8");
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting shop:", error);
-      res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบร้านค้า" });
+app.post("/api/delete-shop", async (req, res) => {
+  const { prefix } = req.body;
+
+  try {
+    const result = await Shop.deleteOne({ prefix });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: "ไม่พบร้านค้าด้วย prefix นี้" });
     }
-  });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("❌ Error deleting shop:", error);
+    res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการลบร้านค้า" });
+  }
+});
   
 
 function setCorrectSignature(channelSecret) {
@@ -762,8 +665,7 @@ function setCorrectSignature(channelSecret) {
     };
   }
 
-
-const setupWebhooks = () => {
+const setupWebhooks = async () => {
     // ✅ ลบเฉพาะ route ที่ขึ้นต้นด้วย "/webhook"
     app._router.stack = app._router.stack.filter((layer) => {
       return !(
@@ -773,16 +675,16 @@ const setupWebhooks = () => {
       );
     });
 
-    loadShopData(); // โหลดข้อมูลร้านค้าใหม่
+    await loadShopData(); // ✅ ใช้ async version
 
     shopData.forEach((shop) => {
-        shop.lines.forEach((lineAccount, index) => {
-            const prefix = shop.prefix;
-            const lineName = lineAccount.linename; // ✅ แก้ตรงนี้
-            const lineConfig = {
-                channelAccessToken: String(lineAccount.access_token),
-                channelSecret: String(lineAccount.secret_token)
-            };
+      shop.lines.forEach((lineAccount, index) => {
+        const prefix = shop.prefix;
+        const lineName = lineAccount.linename;
+        const lineConfig = {
+          channelAccessToken: String(lineAccount.access_token),
+          channelSecret: String(lineAccount.secret_token),
+        };
 
             const client = new line.Client(lineConfig);
             const route = `/webhook/${shop.prefix}/line${index + 1}.bot`;
@@ -798,24 +700,26 @@ const setupWebhooks = () => {
                   events.map(async (event) => await handleEvent(event, client, prefix, lineName ))
                 );
                 res.status(200).send("OK");
-                }
+              }
             );
+          });
         });
-    });
+      };
+
+export const restartWebhooks = async () => {
+  console.log("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
+  broadcastLog("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
+  await loadBankAccounts();        // ✅ รอโหลดให้เสร็จจริง ๆ ก่อนใช้
+  await setupWebhooks();           // ✅ รีเซ็ต webhook
 };
 
-export const restartWebhooks = () => {
-    console.log("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
-    broadcastLog("✅ พบการแก้ไขข้อมูล รีสตาร์ทบอทแล้ว...");
-    loadBankAccounts();
-    setupWebhooks();
-};
+(async () => {
+  await connectDB();
+  await loadBankAccounts();        // ✅ รอโหลดให้เสร็จก่อนบอททำงาน
+  await setupWebhooks();           // ✅ รอ setup ให้เสร็จแน่ ๆ
 
-setupWebhooks(); 
-loadBankAccounts();
-watchBankAccounts();
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ กำลังทำงานที่พอร์ต ${PORT}`);
-});
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`✅ กำลังทำงานที่พอร์ต ${PORT}`);
+  });
+})();

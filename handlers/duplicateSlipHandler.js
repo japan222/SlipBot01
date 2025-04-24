@@ -1,14 +1,15 @@
 // duplicateSlipHandler.js
 import { sendMessageWait } from "../reply/text_reply.js";
 import { sendMessageSame } from "../reply/same_reply.js";
-import fs from "fs";
-import { loadQRDatabaseFromFile, saveQRDatabaseToFile } from "../qrdata/qrData.js";
+import { loadQRDatabaseFromFile, saveQRDatabaseToFile } from "../utils/qrData.js";
 import { analyzeSlipImage, streamToBuffer } from "../utils/qrSlipworker.js";
 import { handleRegularSlip } from "../handlers/regularSlipChecker.js";
 import { getLineProfile } from "../utils/getLineProfile.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
 import { broadcastLog } from "../index.js";
-import { loadSettings } from '../config/settings.js';
+import { getCachedSettings, reloadSettings } from "../utils/settingsManager.js";
+import { connectDB } from "../mongo.js";
+import Shop from "../models/Shop.js";
 
 /**
  * ฟังก์ชันสำหรับตรวจสอบสลิปซ้ำ
@@ -20,39 +21,32 @@ import { loadSettings } from '../config/settings.js';
  * @param {string} prefix - รหัสร้าน (ใช้ในการบันทึกข้อมูล)
  */
 
-let shopData = []; 
+let shopData = [];
 
-const loadShopData = () => {
+export async function loadShopDataFromDB() {
   try {
-    const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-    const jsonData = JSON.parse(rawData);
-    shopData = jsonData.shops || [];
-  } catch (error) {
-    console.error("❌ ไม่สามารถโหลด line_shops.json:", error.message);
-    broadcastLog(`❌ ไม่สามารถโหลด line_shops.json: ${error.message}`); 
-    shopData = []; // กรณีเกิดข้อผิดพลาด ให้ shopData เป็น array ว่าง
+    await connectDB(); // เชื่อม MongoDB ถ้ายังไม่ได้เชื่อม
+    shopData = await Shop.find({}); // ดึงข้อมูลทั้งหมด
+  } catch (err) {
+    console.error("❌ โหลดข้อมูลร้านจาก MongoDB ไม่สำเร็จ:", err.message);
+    shopData = [];
   }
-};
+}
 
 // โหลดข้อมูลร้านค้าในครั้งแรก
-loadShopData();
+await loadShopDataFromDB();
 
-let currentSettings = loadSettings();
+// ✅ โหลดตอนเริ่ม (ใน async block เท่านั้น)
+await reloadSettings(); // โหลดจาก MongoDB
 
-export function getSettings() {
-  return currentSettings;
-}
-
-export function reloadSettings() {
-  currentSettings = loadSettings();
-}
+// ✅ ใช้งาน
 const {
   timeLimit,
   sameQrTimeLimit,
   maxMessagesPerUser,
   maxMessagesSamePerUser,
   maxProcessingPerUser
-} = getSettings();
+} = getCachedSettings();
 
 const programStartTime = Date.now(); // เวลาที่โปรแกรมเริ่มทำงาน
 const userProcessingQueue = new Map(); // คิวการประมวลผลของผู้ใช้
@@ -61,9 +55,7 @@ const processedEvents = new Set(); // เก็บ event ที่ประม�
 
 export async function handleEvent(event, client, prefix, linename, qrDatabase) {
   // ✅ โหลดข้อมูลร้านค้า
-  const rawData = fs.readFileSync("./line_shops.json", "utf-8");
-  const shopData = JSON.parse(rawData).shops || [];
-  const shop = shopData.find(shop => shop.prefix === prefix);
+  const shop = await Shop.findOne({ prefix });
 
   // ✅ ตรวจสอบว่าร้านค้านี้เปิดใช้งานหรือไม่
   if (!shop || !shop.status) return;
@@ -86,7 +78,7 @@ export async function handleEvent(event, client, prefix, linename, qrDatabase) {
     if (event.timestamp < programStartTime) return;
 
     // ✅ โหลดฐานข้อมูล QR Code ของร้านนี้
-    qrDatabase = loadQRDatabaseFromFile(prefix) || new Map();
+    qrDatabase = await loadQRDatabaseFromFile(prefix) || new Map();
 
     // ✅ ตรวจสอบว่าผู้ใช้นี้มีคิวหรือยัง ถ้าไม่มีให้สร้างใหม่
     if (!userProcessingQueue.has(userId)) {
