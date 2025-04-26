@@ -14,6 +14,7 @@ import Shop from "./models/Shop.js";
 import dotenv from "dotenv";
 import SlipResult from "./models/SlipResult.js"; // เพิ่มตรงนี้
 import SlipStat from "./models/SlipStats.js"; 
+import moment from "moment-timezone"; // ต้องใช้ import แบบนี้
 
 dotenv.config({ path: `${process.cwd()}/info.env` }); // ← มาโหลดตรงนี้ช้าไปแล้ว
 
@@ -256,16 +257,23 @@ app.post("/api/delete-bank", async (req, res) => {
 // ✅ POST: รับ slip ใหม่ + บันทึก MongoDB + broadcast
 app.post("/api/slip-results", async (req, res) => {
   try {
-    const moment = require('moment-timezone');
+    const now = moment().tz('Asia/Bangkok').toDate();
 
     const newSlip = {
-      ...req.body,
-      createdAt: moment().tz('Asia/Bangkok').toDate()
+      shop: typeof req.body.shop === 'string' && req.body.shop.trim() !== '' ? req.body.shop : "-",
+      lineName: typeof req.body.lineName === 'string' && req.body.lineName.trim() !== '' ? req.body.lineName : "-",
+      image: typeof req.body.image === 'string' && req.body.image.trim() !== '' ? req.body.image : "",
+      status: req.body.status || "-",
+      response: req.body.response || "-",
+      amount: req.body.amount || 0,
+      ref: req.body.ref || "-",
+      time: req.body.time || "-",
+      createdAt: now
     };
 
     await SlipResult.create(newSlip);
 
-    // ✅ ส่ง SSE ทันที
+    // ส่งผ่าน SSE
     const data = `data: ${JSON.stringify(newSlip)}\n\n`;
     clients.forEach(client => client.write(data));
 
