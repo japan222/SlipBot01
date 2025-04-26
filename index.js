@@ -256,9 +256,11 @@ app.post("/api/delete-bank", async (req, res) => {
 // ✅ POST: รับ slip ใหม่ + บันทึก MongoDB + broadcast
 app.post("/api/slip-results", async (req, res) => {
   try {
+    const moment = require('moment-timezone');
+
     const newSlip = {
       ...req.body,
-      createdAt: new Date() // สำคัญสำหรับ TTL 24 ชม.
+      createdAt: moment().tz('Asia/Bangkok').toDate()
     };
 
     await SlipResult.create(newSlip);
