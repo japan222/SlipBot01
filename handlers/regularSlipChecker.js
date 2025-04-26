@@ -33,10 +33,10 @@ export async function handleRegularSlip(
   qrDatabase,
   qrData,
   userId,
-  lineName,
-  image,
-  linename,
-  tranRef
+  lineName,     // <--- ตรงนี้กำลังรอรับ lineName
+  image,        // <--- รอรับ image
+  linename,     // <--- รอรับ linename
+  tranRef       // <--- รอรับ tranRef
 ) {
   try {
     const now = Date.now();

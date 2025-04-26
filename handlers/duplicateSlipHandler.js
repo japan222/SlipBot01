@@ -236,12 +236,10 @@ export async function handleEvent(event, client, prefix, linename, qrDatabase) {
               qrDatabase,
               qrData,
               userId,
-              userMessageCount,
-              userInfo,
-              lineName,
-              image,
-              linename,
-              tranRef
+              lineName,    // ✅ ส่ง lineName จริง
+              image,       // ✅ ส่ง image จริง
+              linename,    // ✅ ส่ง linename จริง
+              tranRef      // ✅ ส่ง tranRef จริง
             );
 
             // ✅ บันทึกค่า amount หากได้รับจาก SlipOK
