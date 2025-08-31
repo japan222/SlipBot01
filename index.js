@@ -31,7 +31,7 @@ const logClients = [];
 
 // ✅ ตั้ง session ไว้ก่อนเสมอ
 app.use(session({
-  secret: 'a8f5f167f44f4964e6c998dee827110c!@#QWEasd987',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 ชั่วโมง
