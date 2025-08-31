@@ -6,7 +6,10 @@ import dotenv from "dotenv";
 import SlipStats from "../models/SlipStats.js";
 import { fileURLToPath } from "url";
 
-dotenv.config({ path: path.join(process.cwd(), "info.env") });
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

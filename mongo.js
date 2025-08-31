@@ -1,8 +1,13 @@
 // mongo.js
 import mongoose from "mongoose";
+import path from "path";
 import dotenv from "dotenv";
+import fs from "fs";
 
-dotenv.config({ path: `${process.cwd()}/info.env` });
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 export async function connectDB() {
   try {

@@ -1,24 +1,27 @@
 // index.js
 import express from "express";
 import * as line from "@line/bot-sdk";
-import session from "express-session"; // สำหรับจัดการ session
-import { validateAccessToken } from "./utils/lcf.js"; // แยกฟังก์ชันออกไปอยู่ไฟล์อื่น
+import session from "express-session";
+import { validateAccessToken } from "./utils/lcf.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 import credentials from "./credentials.js";
 import * as crypto from "crypto";
-import { handleEvent } from "./handlers/duplicateSlipHandler.js";
+import { handleEvent } from "./handlers/handleEvent.js";
 import { loadSettings, saveSettings, reloadSettings } from './utils/settingsManager.js';
 import BankAccount from "./models/BankAccount.js";
 import Shop from "./models/Shop.js";
 import dotenv from "dotenv";
-import SlipResult from "./models/SlipResult.js"; // เพิ่มตรงนี้
+import SlipResult from "./models/SlipResult.js";
 import SlipStat from "./models/SlipStats.js"; 
-import moment from "moment-timezone"; // ต้องใช้ import แบบนี้
-
-dotenv.config({ path: `${process.cwd()}/info.env` }); // ← มาโหลดตรงนี้ช้าไปแล้ว
-
+import moment from "moment-timezone";
 import { connectDB } from "./mongo.js";
+
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,7 +34,7 @@ const logClients = [];
 
 // ✅ ตั้ง session ไว้ก่อนเสมอ
 app.use(session({
-  secret: 'a8f5f167f44f4964e6c998dee827110c!@#QWEasd987',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 ชั่วโมง
@@ -260,17 +263,17 @@ app.post("/api/slip-results", async (req, res) => {
     const now = moment().tz('Asia/Bangkok').toDate();
 
     const newSlip = {
-      shop: typeof req.body.shop === 'string' && req.body.shop.trim() !== '' ? req.body.shop : "-",
-      lineName: typeof req.body.lineName === 'string' && req.body.lineName.trim() !== '' ? req.body.lineName : "-",
-      image: typeof req.body.image === 'string' && req.body.image.trim() !== '' ? req.body.image : "",
-      status: req.body.status || "-",
-      response: req.body.response || "-",
-      amount: req.body.amount || 0,
-      ref: req.body.ref || "-",
-      time: req.body.time || "-",
+      shop: req.body.shop,
+      lineName: req.body.lineName,
+      image: req.body.image,
+      status: req.body.status,
+      response: req.body.response,
+      amount: req.body.amount,
+      ref: req.body.ref,
+      time: req.body.time,
       createdAt: now
     };
-
+    
     await SlipResult.create(newSlip);
 
     // ส่งผ่าน SSE
@@ -707,7 +710,7 @@ const setupWebhooks = async () => {
               async (req, res) => {
                 const events = req.body.events || [];
                 await Promise.all(
-                  events.map(async (event) => await handleEvent(event, client, prefix, lineName ))
+                  events.map(async (event) => await handleEvent(event, client, prefix, lineName))
                 );
                 res.status(200).send("OK");
               }

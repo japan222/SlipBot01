@@ -3,7 +3,11 @@ import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-dotenv.config({ path: `${process.cwd()}/info.env` });
+
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const slipFile = path.join(process.cwd(), "utils/dataSlip/slip_results.json");
 const slipSchema = new mongoose.Schema({}, { strict: false });

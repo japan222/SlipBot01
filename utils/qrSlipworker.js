@@ -1,6 +1,5 @@
 import jsQR from "jsqr";
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import fs from "fs";
 import { createWorker } from "tesseract.js";
 
 // ✅ keywords ที่พบบ่อยในภาพสลิปธนาคาร

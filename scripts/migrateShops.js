@@ -7,7 +7,10 @@ import path from "path";
 import Shop from "../models/Shop.js";
 import dotenv from "dotenv";
 
-dotenv.config({ path: `${process.cwd()}/info.env` }); // โหลด .env
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 // ✅ Connect MongoDB ก่อน migrate
 await connectDB();

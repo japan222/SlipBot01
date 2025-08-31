@@ -4,7 +4,11 @@ import fs from "fs";
 import path from "path";
 import QrEntry from "../models/QrEntry.js";
 import dotenv from "dotenv";
-dotenv.config({ path: `${process.cwd()}/info.env` }); // โหลด .env
+
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const qrDir = path.join(process.cwd(), "qrdata");
 

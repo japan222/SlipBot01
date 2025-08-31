@@ -4,7 +4,10 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Setting from "../models/Setting.js";
 
-dotenv.config({ path: `${process.cwd()}/info.env` });
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const FILE_PATH = path.join(process.cwd(), "config", "settings.json");
 
