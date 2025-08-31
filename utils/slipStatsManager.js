@@ -22,8 +22,9 @@ const slipResultSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const SlipStat = mongoose.model("SlipStat", slipStatSchema);
-const SlipResult = mongoose.model("SlipResult", slipResultSchema);
+// ✅ แก้ตรงนี้ให้เช็กก่อนว่าเคยสร้างไว้หรือยัง
+const SlipStat = mongoose.models.SlipStat || mongoose.model("SlipStat", slipStatSchema);
+const SlipResult = mongoose.models.SlipResult || mongoose.model("SlipResult", slipResultSchema);
 
 export async function updateSlipStats(prefix, category, amount) {
   if (!prefix || amount == null) return;

@@ -1,4 +1,12 @@
 import OpenAI from 'openai';
+import path from "path";
+import dotenv from "dotenv";
+import fs from "fs";
+
+const envPath = path.join(process.cwd(), "info.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
