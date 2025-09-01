@@ -29,8 +29,8 @@ export async function handleTextEvent(event, client) {
 
   if (event.message.type === 'text') {
     const userMessage = event.message.text.trim();
-    console.log('📥', userId, '|...', userMessage);
-    broadcastLog('📥', userId, '|...', userMessage);
+    console.log('📥', userId, '|', userMessage);
+    broadcastLog('📥', userId, '|', userMessage);
     if (!userMessageHistory.has(userId)) {
       userMessageHistory.delete(userId);
     }
