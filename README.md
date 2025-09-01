@@ -23,3 +23,9 @@ SlipChecker เป็นระบบตรวจสอบสลิปอัต�
 ```bash
 git clone https://github.com/<your-user>/SlipChecker.git
 cd SlipChecker
+
+git rm --cached cred.env info.env
+git rm -r --cached .venv node_modules qrdata stats
+git rm --cached *.log
+git commit -m "🔥 Remove sensitive/generated files from Git tracking"
+git push origin main
