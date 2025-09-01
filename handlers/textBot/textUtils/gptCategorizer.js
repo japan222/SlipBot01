@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import path from "path";
 import dotenv from "dotenv";
 import fs from "fs";
-import { broadcastLog } from "../index.js";
+import { broadcastLog } from "../../../index.js";
 
 const envPath = path.join(process.cwd(), "info.env");
 if (fs.existsSync(envPath)) {
