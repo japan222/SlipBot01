@@ -109,8 +109,8 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     broadcastLog('🏷️ หมวดหมู่ที่สำคัญที่สุด:', finalCategory);
 
     if (!finalCategory || finalCategory === 'other') {
-      console.log('📭 ไม่ตอบกลับหมวด other)');
-      broadcastLog('📭 ไม่ตอบกลับหมวด other)');
+      console.log('📭 ไม่ตอบกลับหมวดอื่นๆ)');
+      broadcastLog('📭 ไม่ตอบกลับหมวดอื่นๆ)');
       clearUserMessageHistory(userId);
       return;
     }
@@ -126,9 +126,11 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
 
     
     // ❌ ไม่ตอบถ้าเพิ่งส่งสลิปมา
-    if (finalCategory === 'deposit_missing' && hasUserSentSlip(userId)) {
-      console.log('⏹️ เพิกเฉย deposit_missing เพราะเพิ่งส่ง slip มาแล้ว');
-      broadcastLog('⏹️ เพิกเฉย deposit_missing เพราะเพิ่งส่ง slip มาแล้ว');
+    if (
+      (finalCategory === 'deposit_missing'|| finalCategory === 'greeting')  && 
+       (hasUserSentSlip(userId))) {
+       console.log('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
+       broadcastLog('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
       clearUserMessageHistory(userId);
       return;
     }
@@ -148,8 +150,8 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
       (hasCategoryInHour(userId, 'withdraw_missing') || hasCategoryInHour(userId, 'withdraw_error'))
     ) {
       clearUserMessageHistory(userId);
-      console.log('⏹️ เพิกเฉย withdraw_missing/withdraw_error เพราะเพิ่งถามมาใน 1 ชม.');
-      broadcastLog('⏹️ เพิกเฉย withdraw_missing/withdraw_error เพราะเพิ่งถามมาใน 1 ชม.');
+      console.log('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะเพิ่งถามมาใน 1 ชม.');
+      broadcastLog('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะเพิ่งถามมาใน 1 ชม.');
       return;
     }
 
@@ -196,8 +198,8 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
           await client.replyMessage(replyToken, messages);
           clearUserMessageHistory(userId);
         } catch (err) {
-          console.error('❌ ส่งข้อความ register ล้มเหลว:', err);
-          broadcastLog('❌ ส่งข้อความ register ล้มเหลว:', err);
+          console.error('❌ ส่งข้อความ "ขอข้อมูล" ล้มเหลว:', err);
+          broadcastLog('❌ ส่งข้อความ "ขอข้อมูล" ล้มเหลว:', err);
         }
       }
 
@@ -211,8 +213,8 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     }
 
     if (finalCategory === 'greeting' && hasUserSentImage(userId)) {
-      console.log(`เพิกเฉย greeting เพราะมีการส่งภาพมา`);
-      broadcastLog(`เพิกเฉย greeting เพราะมีการส่งภาพมา`);
+      console.log(`เพิกเฉย "ข้อความทักทาย" เพราะมีการส่งภาพมา`);
+      broadcastLog(`เพิกเฉย "ข้อความทักทาย" เพราะมีการส่งภาพมา`);
       clearUserMessageHistory(userId);
       return;
     }
