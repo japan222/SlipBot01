@@ -14,6 +14,12 @@ import { broadcastLog } from "../index.js";
 import { getCachedSettings, reloadSettings } from "../utils/settingsManager.js";
 import { connectDB } from "../mongo.js";
 import Shop from "../models/Shop.js";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js'; 
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /**
  * ฟังก์ชันสำหรับตรวจสอบสลิปซ้ำ
@@ -86,24 +92,27 @@ async function processDuplicateSlip({
   prefix,
 }) {
   console.log(`📦 QR นี้เคยถูกตรวจแล้ว`);
+
   const qrInfo = qrDatabase.get(qrData);
-  const qrUsers = Array.from(qrInfo.users.keys());
-  console.log(`📌 พบผู้ใช้ที่เคยส่ง QR นี้: ${qrUsers.join(", ")}`);
+  if (!qrInfo) {
+    console.log(`⚠️ ไม่พบข้อมูล qrInfo ในฐานข้อมูลภายใน memory`);
+    return false;
+  }
 
-  if (qrInfo.users.has(userId)) {
-    const userRecord = qrInfo.users.get(userId);
-    const lastSentTime = userRecord.lastSentTime || 0;
-    const sameMessageCount = userRecord.messageCount || 0;
-    console.log(`🔄 [ซ้ำ] ผู้ใช้เดิมเคยส่ง QR นี้`);
-    console.log(
-      `⏱️ เวลาเดิม: ${new Date(lastSentTime).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}`
-    );
-    console.log(`📊 messageCount = ${sameMessageCount}`);
+  const userEntry = qrInfo.users.get(userId);
+  const tranRef = qrData.length > 20 ? qrData.slice(-20) : qrData;
 
+  // 🔁 กรณีผู้ใช้เดิมเคยส่งมาแล้ว
+  if (userEntry) {
+    const lastSentTime = userEntry.lastSentTime || 0;
+    const sameMessageCount = userEntry.messageCount || 0;
+
+    // ⏳ ภายในเวลา sameQrTimeLimit → อาจตอบ "รอสักครู่"
     if (now - lastSentTime < sameQrTimeLimit) {
       if (sameMessageCount < maxMessagesSamePerUser) {
         console.log(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
         broadcastLog(`🔔 ตอบกลับ "รอสักครู่" ครั้งแรกให้กับ ${userId}`);
+
         await reportSlipResultToAPI({
           time: getCurrentTimeOnly(),
           shop: linename,
@@ -114,8 +123,10 @@ async function processDuplicateSlip({
           amount: qrInfo.amount,
           ref: qrData,
         });
+
         await sendMessageWait(event.replyToken, client);
 
+        // ✅ บันทึกว่าเคยส่งแล้ว
         qrInfo.users.set(userId, {
           lastSentTime: now,
           messageCount: sameMessageCount + 1,
@@ -125,21 +136,17 @@ async function processDuplicateSlip({
         finishUserTask(userId);
         return true;
       } else {
-        console.log(
-          `⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งซ้ำเกิน ${maxMessagesSamePerUser} ครั้ง`
-        );
-        broadcastLog(
-          `⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งซ้ำเกิน ${maxMessagesSamePerUser} ครั้ง`
-        );
+        console.log(`⏳ เพิกเฉย: ผู้ใช้ ${userId} สลิปนี้ส่งมาเกิน ${maxMessagesSamePerUser} ครั้ง`);
+        broadcastLog(`⏳ เพิกเฉย: ผู้ใช้ ${userId} สลิปนี้ส่งมาเกิน ${maxMessagesSamePerUser} ครั้ง`);
+        finishUserTask(userId);
         return true;
       }
     }
   }
 
-  const tranRef = qrData.length > 20 ? qrData.slice(-20) : qrData;
+  // 📛 กรณีส่งซ้ำ "แต่เลยเวลา sameQrTimeLimit แล้ว" (จะตอบว่า "สลิปซ้ำเดิม")
   console.log(`🔴 พบสลิป QR Code ซ้ำ ❌`);
   broadcastLog(`🔴 พบสลิป QR Code ซ้ำ ❌`);
-  saveQRDatabaseToFile(prefix, qrDatabase);
   finishUserTask(userId);
 
   await reportSlipResultToAPI({
@@ -161,6 +168,19 @@ async function processDuplicateSlip({
     }) + " น.",
     tranRef
   );
+
+  // ✅ หากเป็นผู้ใช้ใหม่ ให้เพิ่ม user เข้าไปด้วย
+  if (!userEntry) {
+    qrInfo.users.set(userId, {
+      lastSentTime: now,
+      messageCount: 1,
+    });
+  } else {
+    userEntry.lastSentTime = now;
+    userEntry.messageCount += 1;
+  }
+
+  saveQRDatabaseToFile(prefix, qrDatabase);
   return true;
 }
 
@@ -171,27 +191,15 @@ async function forwardNormalSlip({
   qrDatabase,
   userId,
   now,
-  timeLimit,
-  maxMessagesPerUser,
   prefix,
   shop,
   linename,
   lineName,
   image,
   userInfo,
+  isNew,
+  replyInfo
 }) {
-  if (
-    now - userInfo.lastSentTime < timeLimit &&
-    userInfo.qrMessageCount >= maxMessagesPerUser
-  ) {
-    console.log(
-      `⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`
-    );
-    broadcastLog(
-      `⏳ เพิกเฉย: ผู้ใช้ ${userId} ส่งสลิปเกิน ${maxMessagesPerUser} ครั้ง`
-    );
-    return;
-  }
 
   userMessageCount.set(userId, {
     lastSentTime: now,
@@ -205,8 +213,8 @@ async function forwardNormalSlip({
   };
 
   if (shop.slipCheckOption === "all") {
-    console.log(`🆕 ส่งต่อไปตรวจสลิปที่ SlipOK`);
-    broadcastLog(`🆕 ส่งต่อไปตรวจสลิปที่ SlipOK`);
+    console.log(`🆕 ส่งต่อไปตรวจสลิปที่ Slip2Go`);
+    broadcastLog(`🆕 ส่งต่อไปตรวจสลิปที่ Slip2Go`);
     const slipData = await handleRegularSlip(
       client,
       event.message.id,
@@ -218,7 +226,9 @@ async function forwardNormalSlip({
       lineName,
       image,
       linename,
-      tranRef
+      tranRef,
+      isNew,
+      replyInfo
     );
     if (slipData && slipData.amount !== undefined) {
       qrEntry.amount = slipData.amount;
@@ -227,7 +237,6 @@ async function forwardNormalSlip({
 
   qrDatabase.set(qrData, qrEntry);
   saveQRDatabaseToFile(prefix, qrDatabase);
-  finishUserTask(userId);
 }
 
 
@@ -240,9 +249,10 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
       maxMessagesSamePerUser,
     } = getCachedSettings();
     
+    const replyInfo = await getRandomReplyFromFile('info');
     const userId = event.source.userId;
     const messageId = event.message.id;
-    const now = Date.now();
+    
     clearUserTimeout(userId);
     clearUserMessageHistory(userId);
 
@@ -257,7 +267,6 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
       const profile = await getLineProfile(userId, shop.lines[0].access_token);
       const lineName = profile?.displayName || "-";
       const image = profile?.pictureUrl || "";
-      const isNew = isNewCustomer(userId);
 
       if (event.timestamp < programStartTime) return;
 
@@ -265,13 +274,31 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
         console.log("❌ ไม่ใช่ภาพสลิป");
         broadcastLog("❌ ไม่ใช่ภาพสลิป");
         setUserSentImage(userId);
-        console.log("ภาพทั่วไป → บันทึกว่า user ส่งรูปมา");
         return;
       }
 
       setUserSentSlip(userId);
-      console.log("ตรวจพ QR → บันทึกว่า user ส่งสลิป");
+      if (!global.qrImageSendLog) {
+        global.qrImageSendLog = new Map(); // สร้างครั้งเดียวแบบ global
+      }
 
+      const now = Date.now();
+      const logList = global.qrImageSendLog.get(userId) || [];
+      const isNew = isNewCustomer(userId);
+
+      // คัดกรองเฉพาะรายการที่ยังอยู่ในช่วง 5 นาทีล่าสุด
+      const validLogs = logList.filter((timestamp) => now - timestamp < timeLimit);
+
+      // ❌ หากเกินจำนวนอนุญาต ให้เพิกเฉย
+      if (validLogs.length >= maxMessagesPerUser) {
+        console.log(`🚫 ผู้ใช้ ${userId} ส่งภาพ QR เกิน ${maxMessagesPerUser} ครั้งใน 5 นาที`);
+        broadcastLog(`🚫 ผู้ใช้ ${userId} ส่งภาพ QR เกิน ${maxMessagesPerUser} ครั้งใน 5 นาที`);
+        return;
+      }
+
+      // ✅ บันทึก timestamp ใหม่ล่าสุด
+      validLogs.push(now);
+      global.qrImageSendLog.set(userId, validLogs);
 
       if (qrData.suspicious) {
         await processSuspiciousSlip({ linename, lineName, image });
@@ -319,6 +346,8 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
         lineName,
         image,
         userInfo,
+        isNew,
+        replyInfo
       });
     });
   } catch (error) {
@@ -328,10 +357,6 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
 }
 
 function getCurrentTimeOnly() {
-  return new Date().toLocaleTimeString("th-TH", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Bangkok"
-  }) + " น.";
+  return dayjs().tz('Asia/Bangkok').format('HH:mm') + ' น.';
 }
 

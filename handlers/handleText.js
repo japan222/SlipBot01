@@ -2,10 +2,9 @@
 import { askGPT, categorizeFromGptReply } from "./textBot/textUtils/gptCategorizer.js";
 import { detectCategory } from "./textBot/textUtils/keywords.js";
 import { getRandomReplyFromFile } from "./textBot/textUtils/reply.js";
-import { saveCategoryForUser, hasCategory } from "./textBot/textUtils/userCategoryMemory.js";
+import { saveCategoryForUser, hasCategory, hasCategoryInHour } from "./textBot/textUtils/userCategoryMemory.js";
 import { getTime, clearUserTimeout, hasUserSentImage, hasUserSentSlip, clearUserMessageHistory, waitTimeouts, userMessageHistory } from "./handleEvent.js";
 import { isNewCustomer, checkAndSavePhoneNumber } from "../utils/savePhoneNumber.js";
-
 
 function findMostImportantCategory(categories) {
   const categoryPriority = ['deposit_missing', 'register', 'withdraw_error','withdraw_missing', 'other', 'greeting'];
@@ -61,7 +60,10 @@ export async function handleTextEvent(event, client) {
 
     saveCategoryForUser(userId, category);
 
-    // ✍️ บันทึกข้อความ + หมวดหมู่
+    if (!userMessageHistory.has(userId)) {
+      userMessageHistory.set(userId, []);
+    }
+
     userMessageHistory.get(userId).push({
       text: userMessage,
       time: now,
@@ -132,22 +134,34 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
       }
     }
 
+    if (
+      (finalCategory === 'withdraw_missing' || finalCategory === 'withdraw_error') &&
+      (hasCategoryInHour(userId, 'withdraw_missing') || hasCategoryInHour(userId, 'withdraw_error'))
+    ) {
+      clearUserMessageHistory(userId);
+      console.log('⏹️ เพิกเฉย withdraw_missing/withdraw_error เพราะเพิ่งถามมาใน 1 ชม.');
+      return;
+    }
+
     if (finalCategory === 'withdraw_missing') {
-      if (nowMinutes >= 1350  || nowMinutes < 120 ) {
+      if (nowMinutes >= 1345  || nowMinutes < 125 ) {
         // ช่วงปิดถอน
         if (replyWithdrawError) {
           messages.push({ type: 'text', text: replyWithdrawError });
         }
       } else {
         // ช่วงปกติ
-        if (replyWithdrawMissing) {
+        if (isNew && replyInfo) {
+          messages.push({ type: 'text', text: replyInfo });
+        } else if (replyWithdrawMissing) {
+          // เฉพาะลูกค้าเก่าเท่านั้นที่จะมาถึงตรงนี้
           messages.push({ type: 'text', text: replyWithdrawMissing });
         }
       }
     }
 
     if (finalCategory === 'withdraw_error') {
-      if (nowMinutes >= 1350 || nowMinutes < 120) {
+      if (nowMinutes >= 1345  || nowMinutes < 125 ) {
         if (replyWithdrawError) {
           messages.push({ type: 'text', text: replyWithdrawError });
         }

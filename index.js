@@ -58,7 +58,6 @@ app.use("/webhook", express.raw({ type: "application/json" })); // อยู่�
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 let shopData = [];
 
 // Endpoint สำหรับส่ง Logs แบบเรียลไทม์

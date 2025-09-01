@@ -4,7 +4,7 @@ import { sendMessageWait } from "../../reply/text_reply.js";
 import { sendMessageOld } from "../../reply/oldpic_reply.js";
 import { sendMessageWrong } from "../../reply/wrong_reply.js";
 import { sendMessageMinimum } from "../../reply/minimum_reply.js";
-import { sendImageToSlipOK } from "./slipService.js"; 
+import { sendImageToSlip2Go } from "./slipService.js"; 
 import { saveQRDatabaseToFile } from "../../utils/qrData.js";
 import bankCodeMapping from "../../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../../utils/slipStatsManager.js";
@@ -12,6 +12,9 @@ import { reportSlipResultToAPI } from "../../utils/slipStatsManager.js";
 import { broadcastLog } from "../../index.js";
 import { isAccountNumberMatch } from "../../utils/accountUtils.js";
 import BankAccount from "../../models/BankAccount.js";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js'; 
 
 /**
  * ฟังก์ชันสำหรับตรวจสอบสลิปแบบปกติ
@@ -24,6 +27,8 @@ import BankAccount from "../../models/BankAccount.js";
  * @param {string} userId - รหัสผู้ใช้ที่ส่งสลิป
  */
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export async function handleRegularSlip(
   client,
@@ -36,23 +41,19 @@ export async function handleRegularSlip(
   lineName,     // <--- ตรงนี้กำลังรอรับ lineName
   image,        // <--- รอรับ image
   linename,     // <--- รอรับ linename
-  tranRef       // <--- รอรับ tranRef
+  tranRef,     // <--- รอรับ tranRef
+  isNew,
+  replyInfo
 ) {
   try {
     const now = Date.now();
-    const slipOKResponse = await sendImageToSlipOK(client, messageId);
+    const Slip2GoResponse = await sendImageToSlip2Go(client, messageId);
     const bankList = await BankAccount.find({ prefix });
 
-    const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Bangkok"
-    }) + " น.";
-
-    if (slipOKResponse.status === "valid") {
-      const data = slipOKResponse.data;
-      if (!data) return { amount: undefined };
+    const thaiTime = dayjs().tz("Asia/Bangkok").format("HH:mm") + " น.";
+    if (Slip2GoResponse.status === "valid") {
+    const data = Slip2GoResponse.data?.data;
+        if (!data || data.amount == null) return { amount: undefined };
         const Amount = data.amount;
         console.log(`💰 จำนวนเงินในสลิป: ${Amount} บาท`);
         broadcastLog(`💰 จำนวนเงินในสลิป: ${Amount} บาท`);
@@ -83,7 +84,7 @@ export async function handleRegularSlip(
                 console.log("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่เปิดใช้ในการตรวจสอบ.... ");
                 broadcastLog("ข้ามการตรวจสอบบัญชี ไม่มีบัญชีที่เปิดใช้ในการตรวจสอบ.... ");
               } else {
-                const receiverAccount = data.receiver?.account?.value || data.receiver?.proxy?.value || "ไม่ระบุ";
+                const receiverAccount = data.receiver?.account?.bank?.account || "ไม่ระบุ";
                 let accountMatched = false;
             
                 for (const account of activeAccounts) {
@@ -105,10 +106,10 @@ export async function handleRegularSlip(
                   broadcastLog(`🔴 พบสลิปบัญชีปลายทางไม่ถูกต้อง ❌`);
                   updateSlipStats(prefix, "ตรวจสลิปปลายทางไม่ถูกต้องไปแล้ว", data.amount);
                   await sendMessageWrong(replyToken, client,
-                    tranRef, data.amount, data.sender?.displayName || "ไม่ระบุ",
-                    data.sender?.account.value || data.sender?.proxy.value,
-                    data.receiver?.displayName || "ไม่ระบุ",
-                    data.receiver?.account.value || data.receiver?.proxy.value
+                    tranRef, data.amount, data.sender?.account?.name || "ไม่ระบุ",
+                    data.sender?.account?.bank?.account || "ไม่ระบุ",
+                    data.receiver?.account?.name || "ไม่ระบุ",
+                    data.receiver?.account?.bank?.account || "ไม่ระบุ"
                   );
                   await reportSlipResultToAPI({
                     time: thaiTime,
@@ -125,39 +126,33 @@ export async function handleRegularSlip(
             }
           }
 
-            const fromBank = getBankName(data.sendingBank) || "ไม่ระบุ";
-            const toBank = getBankName(data.receivingBank) || "ไม่ระบุ";
-            const transactionDate = new Date(
-              `${data.transDate.slice(0, 4)}-${data.transDate.slice(4, 6)}-${data.transDate.slice(6, 8)}T${data.transTime}+07:00`
-            );
+            const fromBank = data.sender.bank?.name || "ไม่ระบุ";
+            const toBank = data.receiver.bank?.name || "ไม่ระบุ";
+            const transactionDate = dayjs(data.dateTime).tz("Asia/Bangkok");
 
-            const daysDifference = (now - transactionDate.getTime()) / (1000 * 60 * 60 * 24);
+            const daysDifference = dayjs().tz("Asia/Bangkok").diff(transactionDate, 'day');
 
-            const timeOnly = transactionDate.toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-              timeZone: "Asia/Bangkok"
-            }) + " น.";
-  
+            const timeOnly = transactionDate.format("HH:mm") + " น.";
+
+            // วันที่ + เดือน + ปีไทย
             const monthsThai = [
-                "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-                "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+              "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+              "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
             ];
 
-            const formattedTransactionDateTime = `${transactionDate.getDate()} ${
-              monthsThai[transactionDate.getMonth()]
-            } ${transactionDate.getFullYear() + 543} ${timeOnly}`;
+            const formattedTransactionDateTime = `${transactionDate.date()} ${
+              monthsThai[transactionDate.month()]
+            } ${transactionDate.year() + 543} ${timeOnly}`;
             
             if (Amount < process.env.MINIMUM_AMOUNT) {
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               broadcastLog(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               updateSlipStats(prefix, "ตรวจสลิปยอดเงินต่ำกว่าที่กำหนดไปแล้ว", Amount);
               await sendMessageMinimum(replyToken,client,formattedTransactionDateTime,
-                tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
-                fromBank ,data.sender?.account.value || data.sender?.proxy.value,
-                data.receiver?.displayName || "ไม่ระบุ", toBank,
-                data.receiver?.account.value || data.receiver?.proxy.value
+                tranRef,data.amount,data.sender?.account?.name || "ไม่ระบุ",
+                fromBank ,data.sender?.account?.bank?.account || "ไม่ระบุ",
+                data.receiver?.account?.name || "ไม่ระบุ",
+                data.receiver?.account?.bank?.account || "ไม่ระบุ"
               );
               await reportSlipResultToAPI({
                 time: thaiTime,
@@ -178,10 +173,10 @@ export async function handleRegularSlip(
               broadcastLog("🟡 พบสลิปย้อนหลังเกิน 2 วัน ❕");
               updateSlipStats(prefix, "ตรวจสลิปย้อนหลังไปแล้ว", Amount);
               await sendMessageOld(replyToken,client,formattedTransactionDateTime,
-                tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
-                fromBank, data.sender?.account.value || data.sender?.proxy.value,
-                data.receiver?.displayName || "ไม่ระบุ", toBank,
-                data.receiver?.account.value || data.receiver?.proxy.value
+                tranRef,data.amount,data.sender?.account?.name || "ไม่ระบุ",
+                fromBank, data.sender?.account?.bank?.account || "ไม่ระบุ",
+                data.receiver?.account?.name || "ไม่ระบุ", toBank,
+                data.receiver?.account?.bank?.account || "ไม่ระบุ"
               );
               await reportSlipResultToAPI({
                 time: thaiTime,
@@ -200,12 +195,30 @@ export async function handleRegularSlip(
             console.log("🟢 สลิปถูกต้อง ✅");
             broadcastLog("🟢 สลิปถูกต้อง ✅");
             updateSlipStats(prefix, "ตรวจสลิปถูกต้องไปแล้ว", Amount);
-            await sendMessageRight(replyToken,client,formattedTransactionDateTime,
-              tranRef,data.amount,data.sender?.displayName || "ไม่ระบุ",
-              fromBank, data.sender?.account.value || data.sender?.proxy.value,
-              data.receiver?.displayName || "ไม่ระบุ", toBank,
-              data.receiver?.account.value || data.receiver?.proxy.value
+
+            // ตอบกลับหลัก
+            await sendMessageRight(
+              replyToken,
+              client,
+              formattedTransactionDateTime,
+              tranRef,
+              data.amount,
+              data.sender?.account?.name || "ไม่ระบุ",
+              fromBank,
+              data.sender?.account?.bank?.account || "ไม่ระบุ",
+              data.receiver?.account?.name || "ไม่ระบุ",
+              toBank,
+              data.receiver?.account?.bank?.account || "ไม่ระบุ"
             );
+
+            // ตอบข้อความ info เพิ่ม หากเป็นลูกค้าใหม่
+            if (isNew && replyInfo) {
+              await client.pushMessage(userId, {
+                type: 'text',
+                text: replyInfo
+              });
+            }
+
             await reportSlipResultToAPI({
               time: thaiTime,
               shop: linename,
@@ -218,13 +231,8 @@ export async function handleRegularSlip(
             });
             return { amount: Amount };
           }        
-            if (slipOKResponse.status === "Wait") {
-              const thaiTime = new Date(now).toLocaleTimeString("th-TH", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-                timeZone: "Asia/Bangkok"
-              }) + " น.";
+            if (Slip2GoResponse.status === "Wait") {
+              const thaiTime = dayjs().tz("Asia/Bangkok").format("HH:mm") + " น.";
               console.log("⏱️ สถานะ: รอตรวจสอบ");
               broadcastLog("⏱️ สถานะ: รอตรวจสอบ");
               await sendMessageWait(replyToken, client);
@@ -241,7 +249,7 @@ export async function handleRegularSlip(
               return { amount: undefined };
             }
           
-            if (slipOKResponse.status === "timeout") {
+            if (Slip2GoResponse.status === "timeout") {
               console.log("⏱️ สถานะ: ใช้เวลาตรวจสอบนานเกินไป");
               broadcastLog("⏱️ สถานะ: ใช้เวลาตรวจสอบนานเกินไป");
               await sendMessageWait(replyToken, client);
@@ -258,7 +266,7 @@ export async function handleRegularSlip(
               return { amount: undefined };
             }
           
-            if (slipOKResponse.status === "ignored" || slipOKResponse.status === "error") {
+            if (Slip2GoResponse.status === "ignored" || Slip2GoResponse.status === "error") {
               await reportSlipResultToAPI({
                 time: thaiTime,
                 shop: linename,

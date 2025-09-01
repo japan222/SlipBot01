@@ -2,13 +2,19 @@
 import Shop from '../models/Shop.js';                     
 import { handleImageEvent } from './handlerImage.js';      
 import { handleTextEvent } from './handleText.js';
-import { broadcastLog } from '../index.js';               
+import { broadcastLog } from '../index.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';     
 
 const waitTimeouts = new Map();
 const userMessageHistory = new Map();
 const usersWhoSentImage = new Map(); 
 const usersWhoSentSlip = new Map(); 
 const slipTimeouts = new Map();
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function handleEvent(event, client, prefix, linename, qrDatabase) {
   // ✅ โหลดข้อมูลร้านค้า
@@ -49,9 +55,9 @@ function clearUserMessageHistory(userId) {
 }
 
 function getTime() {
-  const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' });
-  const date = new Date(now);
-  return date.getHours() * 60 + date.getMinutes(); // เวลาเป็นนาที เช่น 22:30 → 1350
+  const now = dayjs().tz('Asia/Bangkok');
+  console.log("⏰ เวลาไทย:", now.format('HH:mm'));
+  return now.hour() * 60 + now.minute();
 }
 
 // ✅ สำหรับภาพทั่วไป (ไม่ใช่สลิป)
