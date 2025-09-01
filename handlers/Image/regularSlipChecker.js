@@ -9,6 +9,7 @@ import { saveQRDatabaseToFile } from "../../utils/qrData.js";
 import bankCodeMapping from "../../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../../utils/slipStatsManager.js";
 import { reportSlipResultToAPI } from "../../utils/slipStatsManager.js";
+import { finishUserTask } from "../utils/userQueueManager.js";
 import { broadcastLog } from "../../index.js";
 import { isAccountNumberMatch } from "../../utils/accountUtils.js";
 import BankAccount from "../../models/BankAccount.js";
@@ -148,6 +149,7 @@ export async function handleRegularSlip(
               console.log(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               broadcastLog(`🟡 พบสลิปยอดเงินต่ำกว่ากำหนด จำนวน ${Amount} บาท ❕`);
               updateSlipStats(prefix, "ตรวจสลิปยอดเงินต่ำกว่าที่กำหนดไปแล้ว", Amount);
+              finishUserTask(userId);
               await sendMessageMinimum(replyToken,client,formattedTransactionDateTime,
                 tranRef,data.amount,data.sender?.account?.name || "ไม่ระบุ",
                 fromBank ,data.sender?.account?.bank?.account || "ไม่ระบุ",
@@ -172,6 +174,7 @@ export async function handleRegularSlip(
               console.log("🟡 พบสลิปย้อนหลังเกิน 2 วัน ❕");
               broadcastLog("🟡 พบสลิปย้อนหลังเกิน 2 วัน ❕");
               updateSlipStats(prefix, "ตรวจสลิปย้อนหลังไปแล้ว", Amount);
+              finishUserTask(userId);
               await sendMessageOld(replyToken,client,formattedTransactionDateTime,
                 tranRef,data.amount,data.sender?.account?.name || "ไม่ระบุ",
                 fromBank, data.sender?.account?.bank?.account || "ไม่ระบุ",
@@ -195,6 +198,7 @@ export async function handleRegularSlip(
             console.log("🟢 สลิปถูกต้อง ✅");
             broadcastLog("🟢 สลิปถูกต้อง ✅");
             updateSlipStats(prefix, "ตรวจสลิปถูกต้องไปแล้ว", Amount);
+            finishUserTask(userId);
 
             // ตอบกลับหลัก
             await sendMessageRight(

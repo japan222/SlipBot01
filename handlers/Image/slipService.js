@@ -37,9 +37,6 @@ export async function sendImageToSlip2Go(client, messageId) {
     const data = response.data;
     const code = data.code;
 
-    console.log("📦 Response จาก Slip2Go:", JSON.stringify(data, null, 2));
-    broadcastLog("📦 Response จาก Slip2Go:\n" + JSON.stringify(data, null, 2));
-
     // กรณีสถานะ 200
     if (code === "200000") {
       return { success: true, status: "valid", data };

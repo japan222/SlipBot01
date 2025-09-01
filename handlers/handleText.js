@@ -5,6 +5,7 @@ import { getRandomReplyFromFile } from "./textBot/textUtils/reply.js";
 import { saveCategoryForUser, hasCategory, hasCategoryInHour } from "./textBot/textUtils/userCategoryMemory.js";
 import { getTime, clearUserTimeout, hasUserSentImage, hasUserSentSlip, clearUserMessageHistory, waitTimeouts, userMessageHistory } from "./handleEvent.js";
 import { isNewCustomer, checkAndSavePhoneNumber } from "../utils/savePhoneNumber.js";
+import { broadcastLog } from "../index.js";
 
 function findMostImportantCategory(categories) {
   const categoryPriority = ['deposit_missing', 'register', 'withdraw_error','withdraw_missing', 'other', 'greeting'];
@@ -15,6 +16,7 @@ function findMostImportantCategory(categories) {
     }
   }
 
+  broadcastLog('⚠️ ไม่พบหมวดหมู่ที่ตรงตามลำดับความสำคัญ');
   console.log('⚠️ ไม่พบหมวดหมู่ที่ตรงตามลำดับความสำคัญ');
   return null;
 }
@@ -28,7 +30,7 @@ export async function handleTextEvent(event, client) {
   if (event.message.type === 'text') {
     const userMessage = event.message.text.trim();
     console.log('📥', userId, '|...', userMessage);
-
+    broadcastLog('📥', userId, '|...', userMessage);
     if (!userMessageHistory.has(userId)) {
       userMessageHistory.delete(userId);
     }
@@ -36,6 +38,7 @@ export async function handleTextEvent(event, client) {
     let category = detectCategory(userMessage);
     if (category) {
       console.log(`🔍 ตรงกับ keywords หมวดหมู่: ${category}`);
+      broadcastLog(`🔍 ตรงกับ keywords หมวดหมู่: ${category}`);
     } else {
       // 📛 กรองข้อความที่มีตัวเลขเยอะ (ป้องกันเบอร์โทร/เลขบัญชี)
       const digits = (userMessage.match(/\d/g) || []).length;
@@ -50,6 +53,7 @@ export async function handleTextEvent(event, client) {
 
       // 🔍 ถ้าไม่เจอ keyword → ส่งไปให้ GPT
       console.log('ส่งข้อความให้ GPT วิเคราะห์');
+      broadcastLog('ส่งข้อความให้ GPT วิเคราะห์');
       const gptReply = await askGPT(userMessage);
 
       const result = categorizeFromGptReply(gptReply);
@@ -74,6 +78,7 @@ export async function handleTextEvent(event, client) {
     if (WAIT_CATEGORIES.includes(category)) {
       clearUserTimeout(userId);
       console.log(`⏳ รอ 10 วิ ก่อนตอบ ...`);
+      broadcastLog(`⏳ รอ 10 วิ ก่อนตอบ ...`);
       const timeoutId = handleDelayedReply(userId, event.replyToken, client, isNew);
       waitTimeouts.set(userId, timeoutId);
       return;
@@ -97,12 +102,15 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     }
 
     console.log('📌 รายการหมวดหมู่ที่ตรวจพบ:', categoryList);
+    broadcastLog('📌 รายการหมวดหมู่ที่ตรวจพบ:', categoryList);
 
     const finalCategory = findMostImportantCategory(categoryList);
     console.log('🏷️ หมวดหมู่ที่สำคัญที่สุด:', finalCategory);
+    broadcastLog('🏷️ หมวดหมู่ที่สำคัญที่สุด:', finalCategory);
 
     if (!finalCategory || finalCategory === 'other') {
       console.log('📭 ไม่ตอบกลับหมวด other)');
+      broadcastLog('📭 ไม่ตอบกลับหมวด other)');
       clearUserMessageHistory(userId);
       return;
     }
@@ -120,6 +128,7 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     // ❌ ไม่ตอบถ้าเพิ่งส่งสลิปมา
     if (finalCategory === 'deposit_missing' && hasUserSentSlip(userId)) {
       console.log('⏹️ เพิกเฉย deposit_missing เพราะเพิ่งส่ง slip มาแล้ว');
+      broadcastLog('⏹️ เพิกเฉย deposit_missing เพราะเพิ่งส่ง slip มาแล้ว');
       clearUserMessageHistory(userId);
       return;
     }
@@ -140,6 +149,7 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     ) {
       clearUserMessageHistory(userId);
       console.log('⏹️ เพิกเฉย withdraw_missing/withdraw_error เพราะเพิ่งถามมาใน 1 ชม.');
+      broadcastLog('⏹️ เพิกเฉย withdraw_missing/withdraw_error เพราะเพิ่งถามมาใน 1 ชม.');
       return;
     }
 
@@ -187,6 +197,7 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
           clearUserMessageHistory(userId);
         } catch (err) {
           console.error('❌ ส่งข้อความ register ล้มเหลว:', err);
+          broadcastLog('❌ ส่งข้อความ register ล้มเหลว:', err);
         }
       }
 
@@ -201,6 +212,7 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
 
     if (finalCategory === 'greeting' && hasUserSentImage(userId)) {
       console.log(`เพิกเฉย greeting เพราะมีการส่งภาพมา`);
+      broadcastLog(`เพิกเฉย greeting เพราะมีการส่งภาพมา`);
       clearUserMessageHistory(userId);
       return;
     }
@@ -217,9 +229,11 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
         clearUserMessageHistory(userId);
       } catch (err) {
         console.error('❌ ส่งข้อความล้มเหลว:', err);
+        broadcastLog('❌ ส่งข้อความล้มเหลว:', err);
       }
     } else {
       console.log('⚠️ ไม่มีข้อความสำหรับตอบกลับ');
+      broadcastLog('⚠️ ไม่มีข้อความสำหรับตอบกลับ');
       clearUserMessageHistory(userId);
     }
     waitTimeouts.delete(userId);

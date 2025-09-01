@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import path from "path";
 import dotenv from "dotenv";
 import fs from "fs";
+import { broadcastLog } from "../index.js";
 
 const envPath = path.join(process.cwd(), "info.env");
 if (fs.existsSync(envPath)) {
@@ -57,9 +58,11 @@ async function askGPT(userMessage) {
 
     const reply = completion.choices[0].message.content;
     console.log('🤖 [GPT ตอบกลับ]:', reply);
+    broadcastLog(`🤖 [GPT ตอบกลับ]: ${reply}`);
     return reply;
   } catch (error) {
     console.error('❌ [askGPT] เกิดข้อผิดพลาด:', error);
+    broadcastLog(`❌ [askGPT] เกิดข้อผิดพลาด: ${error}`);
     return '';
   }
 }
@@ -71,6 +74,7 @@ function categorizeFromGptReply(gptReply) {
 
   if (!normalizedCategory) {
     console.warn('⚠️ [categorizeFromGptReply] ไม่รู้จักหมวดหมู่:', cleaned);
+    broadcastLog(`⚠️ [categorizeFromGptReply] ไม่รู้จักหมวดหมู่: ${cleaned}`);
     return null;
   }
   return {

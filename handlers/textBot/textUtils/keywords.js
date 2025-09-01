@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { broadcastLog } from "../index.js";
 
 // ✅ แทน __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +22,7 @@ fs.readdirSync(keywordDir).forEach(file => {
       keywords[category] = JSON.parse(content);
     } catch (err) {
       console.error(`❌ Error loading ${file}:`, err);
+      broadcastLog(`❌ Error loading ${file}:`, err);
     }
   }
 });

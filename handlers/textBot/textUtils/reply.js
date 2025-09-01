@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { broadcastLog } from "../index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,7 @@ function getRandomReplyFromFile(filename) {
     }
   } catch (err) {
     console.error(`❌ Error reading ${filename}:`, err);
+    broadcastLog(`❌ Error reading ${filename}:`, err);
   }
 
   return null;
@@ -38,6 +40,7 @@ function getReplyMessage(text) {
   const category = detectCategory(text);
 
   console.log(`📂 ตรวจพบ category: "${category}" สำหรับข้อความ: "${text}"`);
+  broadcastLog(`📂 ตรวจพบ category: "${category}" สำหรับข้อความ: "${text}"`);
 
   const reply = getRandomReplyFromFile(`${category}.json`);
   if (!reply) return null;
