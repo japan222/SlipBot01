@@ -9,7 +9,7 @@ import { saveQRDatabaseToFile } from "../../utils/qrData.js";
 import bankCodeMapping from "../../utils/bankCodeMapping.js";
 import { updateSlipStats } from "../../utils/slipStatsManager.js";
 import { reportSlipResultToAPI } from "../../utils/slipStatsManager.js";
-import { finishUserTask } from "../utils/userQueueManager.js";
+import { finishUserTask } from "../../utils/userQueueManager.js";
 import { broadcastLog } from "../../index.js";
 import { isAccountNumberMatch } from "../../utils/accountUtils.js";
 import BankAccount from "../../models/BankAccount.js";
