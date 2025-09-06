@@ -29,7 +29,7 @@ export async function sendImageToSlip2Go(client, messageId) {
         }
       ),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), 15000)
+        setTimeout(() => reject(new Error("Timeout")), 25000)
       ),
     ]);
 

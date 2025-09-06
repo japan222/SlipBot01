@@ -12,7 +12,12 @@ const qrEntrySchema = new mongoose.Schema({
   qrData: String,          // ค่าจาก QR
   firstDetected: Number,
   amount: Number,
-  users: [userSchema]      // รายการ user ที่เคยส่ง
+  users: [userSchema],      // รายการ user ที่เคยส่ง
+  firstSent: {
+  type: Date,
+  default: Date.now,
+  expires: 60 * 60 * 24 * 5 // ลบหลัง 5 วัน (หน่วยวินาที)
+  }
 });
 
 export default mongoose.model("QrEntry", qrEntrySchema);

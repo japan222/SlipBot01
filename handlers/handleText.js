@@ -120,7 +120,7 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     const replyInfo = await getRandomReplyFromFile('info');
     const replyWithdrawError = await getRandomReplyFromFile('withdraw_error');
     const replyWithdrawMissing = await getRandomReplyFromFile('withdraw_missing');
-
+    const withdrawcount = hasCategoryInHour(userId, finalCategory);
     const nowMinutes = getTime();
     const messages = [];
 
@@ -128,59 +128,55 @@ function handleDelayedReply(userId, replyToken, client, isNew, detectedCategory 
     // ❌ ไม่ตอบถ้าเพิ่งส่งสลิปมา
     if (
       (finalCategory === 'deposit_missing'|| finalCategory === 'greeting')  && 
-       (hasUserSentSlip(userId))) {
-       console.log('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
-       broadcastLog('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
+      (hasUserSentSlip(userId))) {
+      console.log('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
+      broadcastLog('⏹️ เพิกเฉย "ข้อความการฝากเงิน" เพราะเพิ่งส่ง slip มาแล้ว');
       clearUserMessageHistory(userId);
       return;
     }
 
     // ✅ ตอบกลับสำหรับ deposit_missing
     if (finalCategory === 'deposit_missing') {
-      if (isNew && replyInfo) {
-        messages.push({ type: 'text', text: replyInfo });
-      }
       if (replyMissing) {
         messages.push({ type: 'text', text: replyMissing });
       }
     }
 
-    if (
-      (finalCategory === 'withdraw_missing' || finalCategory === 'withdraw_error') &&
-      (hasCategoryInHour(userId, 'withdraw_missing') || hasCategoryInHour(userId, 'withdraw_error'))
-    ) {
+    if ((finalCategory === 'withdraw_missing' || finalCategory === 'withdraw_error') && withdrawcount >= 2) {
       clearUserMessageHistory(userId);
       console.log('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะเพิ่งถามมาใน 1 ชม.');
       broadcastLog('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะเพิ่งถามมาใน 1 ชม.');
       return;
     }
 
+    // ✅ กรณี withdraw_missing
     if (finalCategory === 'withdraw_missing') {
-      if (nowMinutes >= 1345  || nowMinutes < 125 ) {
+      if (nowMinutes >= 1325 || nowMinutes < 125) {
         // ช่วงปิดถอน
         if (replyWithdrawError) {
           messages.push({ type: 'text', text: replyWithdrawError });
         }
       } else {
-        // ช่วงปกติ
-        if (isNew && replyInfo) {
-          messages.push({ type: 'text', text: replyInfo });
-        } else if (replyWithdrawMissing) {
-          // เฉพาะลูกค้าเก่าเท่านั้นที่จะมาถึงตรงนี้
-          messages.push({ type: 'text', text: replyWithdrawMissing });
-        }
+        // ⛔ นอกช่วงปิดถอน เพิกเฉย
+        clearUserMessageHistory(userId);
+        console.log('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะอยู่นอกช่วงปิดถอน');
+        broadcastLog('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะอยู่นอกช่วงปิดถอน');
+        return;
       }
     }
 
+    // ✅ กรณี withdraw_error
     if (finalCategory === 'withdraw_error') {
-      if (nowMinutes >= 1345  || nowMinutes < 125 ) {
+      if (nowMinutes >= 1345 || nowMinutes < 125) {
+        // ช่วงปิดถอน
         if (replyWithdrawError) {
           messages.push({ type: 'text', text: replyWithdrawError });
         }
       } else {
-        if (replyWithdrawMissing) {
-          messages.push({ type: 'text', text: replyWithdrawMissing });
-        }
+        clearUserMessageHistory(userId);
+        console.log('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะอยู่นอกช่วงปิดถอน');
+        broadcastLog('⏹️ เพิกเฉย "ข้อความการถอนเงิน" เพราะอยู่นอกช่วงปิดถอน');
+        return;
       }
     }
 

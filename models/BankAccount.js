@@ -1,3 +1,4 @@
+// models/BankAccount.js
 import mongoose from "mongoose";
 
 const bankAccountSchema = new mongoose.Schema({

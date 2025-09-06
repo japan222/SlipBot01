@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 const LineSchema = new mongoose.Schema({
     linename: String,
+    channel_id: String,
     access_token: String,
     secret_token: String,
 }, { _id: false });

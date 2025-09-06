@@ -57,6 +57,9 @@ export async function saveQRDatabaseToFile(prefix, map) {
           firstDetected: info.firstDetected,
           amount: info.amount || 0,
           users: usersArray
+        },
+        $setOnInsert: {
+          firstSent: new Date() // ✅ เพิ่ม field ใหม่
         }
       },
       { upsert: true }

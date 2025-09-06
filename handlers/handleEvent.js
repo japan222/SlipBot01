@@ -10,6 +10,7 @@ import timezone from 'dayjs/plugin/timezone.js';
 const waitTimeouts = new Map();
 const userMessageHistory = new Map();
 const usersWhoSentImage = new Map(); 
+const usersWhoSentNormalImage = new Map();
 const usersWhoSentSlip = new Map(); 
 const slipTimeouts = new Map();
 
@@ -60,20 +61,29 @@ function getTime() {
   return now.hour() * 60 + now.minute();
 }
 
-// ✅ สำหรับภาพทั่วไป (ไม่ใช่สลิป)
 function setUserSentImage(userId) {
   usersWhoSentImage.set(userId, Date.now());
-  setTimeout(() => usersWhoSentImage.delete(userId), 15 * 60 * 1000);
+  setTimeout(() => usersWhoSentImage.delete(userId), 20 * 60 * 1000);
 }
 
 function hasUserSentImage(userId) {
   return usersWhoSentImage.has(userId);
 }
 
+// ✅ สำหรับภาพทั่วไป (ไม่ใช่สลิป)
+function setUserSentNormalImage(userId) {
+  usersWhoSentNormalImage.set(userId, Date.now());
+  setTimeout(() => usersWhoSentNormalImage.delete(userId), 20 * 60 * 1000);
+}
+
+function hasUserSentNormalImage(userId) {
+  return usersWhoSentNormalImage.has(userId);
+}
+
 // ✅ สำหรับสลิป (มี QR)
 function setUserSentSlip(userId) {
   usersWhoSentSlip.set(userId, Date.now());
-  setTimeout(() => usersWhoSentSlip.delete(userId), 15 * 60 * 1000);
+  setTimeout(() => usersWhoSentSlip.delete(userId), 20 * 60 * 1000);
 }
 
 function hasUserSentSlip(userId) {
@@ -94,6 +104,8 @@ export {
   clearUserTimeout,
   clearUserMessageHistory,
   getTime,
+  hasUserSentNormalImage,
+  setUserSentNormalImage,
   hasUserSentSlip,
   hasUserSentImage,
   setUserSentSlip,

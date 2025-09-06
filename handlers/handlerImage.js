@@ -8,7 +8,7 @@ import { analyzeSlipImage, streamToBuffer } from "../utils/qrSlipworker.js";
 import { handleRegularSlip } from "./Image/regularSlipChecker.js";
 import { getLineProfile } from "../utils/getLineProfile.js";
 import { reportSlipResultToAPI } from "../utils/slipStatsManager.js";
-import { setUserSentSlip, setUserSentImage, clearUserMessageHistory, clearUserTimeout } from "./handleEvent.js";
+import { setUserSentNormalImage, setUserSentSlip, setUserSentImage, clearUserMessageHistory, clearUserTimeout } from "./handleEvent.js";
 import { isNewCustomer } from "../utils/savePhoneNumber.js";
 import { broadcastLog } from "../index.js";
 import { getCachedSettings, reloadSettings } from "../utils/settingsManager.js";
@@ -210,6 +210,7 @@ async function forwardNormalSlip({
   const qrEntry = {
     firstDetected: now,
     users: new Map([[userId, { lastSentTime: now, messageCount: 1 }]]),
+    firstSent: new Date() // ✅ เพิ่มบรรทัดนี้
   };
 
   if (shop.slipCheckOption === "all") {
@@ -256,6 +257,8 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
     clearUserTimeout(userId);
     clearUserMessageHistory(userId);
 
+    setUserSentImage(userId);
+
     const { shop, qrDatabase: loadedQRDatabase } = await loadShopAndQRData(prefix);
     if (!shop) return;
     qrDatabase = loadedQRDatabase;
@@ -273,7 +276,7 @@ export async function handleImageEvent(event, client, prefix, linename, qrDataba
       if (!qrData) {
         console.log("❌ ไม่ใช่ภาพสลิป");
         broadcastLog("❌ ไม่ใช่ภาพสลิป");
-        setUserSentImage(userId);
+        setUserSentNormalImage(userId);
         return;
       }
 
